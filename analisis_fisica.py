@@ -41,7 +41,7 @@ with st.sidebar:
         st.experimental_rerun()
 
 # Crear las dos pestañas principales
-tab1, tab2 = st.tabs(["Análisis de Datos y Regresión", "Calculadora de Incertidumbres Combinadas"])
+tab1, tab2, tab3 = st.tabs(["Análisis de Datos y Regresión", "Calculadora de Incertidumbres Combinadas", "Gráficas automáticas"])
 
 # Contenido de la primera pestaña: Análisis de Datos y Regresión
 with tab1:
@@ -529,4 +529,45 @@ with tab2:
         except Exception as e:
             st.error(f"Error al calcular: {e}")
             st.write("Verifica que la función esté correctamente escrita y que uses los símbolos definidos.")
+with tab3:
+    st.header("Gráficas automáticas con incertidumbres")
+
+    st.write("Introduce tus datos experimentales. La variable X es la independiente (abscisas) y la Y la dependiente (ordenadas).")
+
+    n_puntos = st.number_input("Número de puntos", min_value=2, value=4, step=1)
+
+    st.subheader("Introduce los valores y sus incertidumbres")
+    datos = []
+    for i in range(int(n_puntos)):
+        col1, col2, col3, col4 = st.columns(4)
+        with col1:
+            x = st.number_input(f"x{i+1}", value=float(i+1), key=f"x{i}")
+        with col2:
+            y = st.number_input(f"y{i+1}", value=float(i+2), key=f"y{i}")
+        with col3:
+            dx = st.number_input(f"Δx{i+1}", value=0.0, key=f"dx{i}")
+        with col4:
+            dy = st.number_input(f"Δy{i+1}", value=0.1, key=f"dy{i}")
+        datos.append((x, y, dx, dy))
+
+    if st.button("Generar gráfica"):
+        import matplotlib.pyplot as plt
+        import numpy as np
+
+        xs = np.array([d[0] for d in datos])
+        ys = np.array([d[1] for d in datos])
+        dxs = np.array([d[2] for d in datos])
+        dys = np.array([d[3] for d in datos])
+
+        fig, ax = plt.subplots()
+        ax.errorbar(xs, ys, xerr=dxs, yerr=dys, fmt='o-', capsize=4, ecolor='black', color='tab:blue', label='Datos experimentales')
+        ax.set_xlabel("Variable independiente (X)")
+        ax.set_ylabel("Variable dependiente (Y)")
+        ax.set_title("Gráfico con barras de error")
+        ax.legend()
+        ax.grid(True)
+
+        st.pyplot(fig)
+
+        st.info("La línea une los puntos medidos y los palitos representan las incertidumbres.")
             
