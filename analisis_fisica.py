@@ -4,7 +4,7 @@ import pandas as pd
 import matplotlib.pyplot as plt
 from scipy import stats
 import sympy as sp
-
+from sympy.parsing.latex import parse_latex
 # Configuración global de precisión
 PRECISION = 8  # Número de decimales para mostrar en toda la aplicación
 
@@ -24,7 +24,7 @@ if 'precision' not in st.session_state:
 if 'active_tab' not in st.session_state:
     st.session_state.active_tab = 0
 
-st.title("Calculadora para física")
+st.title("Calculadora estadística")
 
 # Añadir control para la precisión
 with st.sidebar:
@@ -45,7 +45,7 @@ tab1, tab2, tab3 = st.tabs(["Análisis de Datos y Regresión", "Calculadora de I
 
 # Contenido de la primera pestaña: Análisis de Datos y Regresión
 with tab1:
-    st.write("Esta pestaña te ayuda a analizar mediciones de física, calcular estadísticas y realizar regresión lineal.")
+    st.write("En esta pestaña puedes calcular incertidumbres y hacer regresiones lineales")
 
     # Sección para configurar el número de variables y mediciones
     st.header("Configuración")
@@ -394,7 +394,13 @@ with tab2:
     
     # Input para la función
     function_str = st.text_input("Función f(variables, constantes)", value="x**2 + a*y", key="function_input")
-    
+    st.subheader("Opción avanzada: escribir función en LaTeX")
+    latex_str = st.text_area(
+        "Función en LaTeX (ej: x^2 + a y, sin(x), \\pi*x)", 
+        value="", 
+        help="Si tu función es complicada o usa constantes especiales como \\pi, escribe aquí."
+    )
+
     # Botón para calcular
     calcular_clicked = st.button("Calcular valor e incertidumbre")
     
@@ -408,7 +414,16 @@ with tab2:
                 symbols[const] = sp.symbols(const)
             
             # Convertir la cadena de función a una expresión sympy
-            func_expr = sp.sympify(function_str)
+            if latex_str:
+                try:
+                    func_expr = parse_latex(latex_str)
+                    st.write("Expresión convertida desde LaTeX:")
+                    st.latex(sp.latex(func_expr))
+                except Exception as e:
+                    st.error(f"No se pudo convertir LaTeX a función: {e}")
+                    func_expr = sp.sympify(function_str)  # fallback a Python
+            else:
+                func_expr = sp.sympify(function_str)
             
             # Mostrar la expresión en formato LaTeX
             st.write("### Función a evaluar:")
