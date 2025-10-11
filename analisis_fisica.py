@@ -530,46 +530,79 @@ with tab2:
             st.error(f"Error al calcular: {e}")
             st.write("Verifica que la función esté correctamente escrita y que uses los símbolos definidos.")
 with tab3:
-    st.header("Gráficas automáticas con incertidumbres desde CSV")
+    st.header("Gráficas automáticas con incertidumbres")
 
-    st.write("Sube un archivo CSV con tus datos experimentales y selecciona qué columnas usar.")
+    st.write("Puedes introducir tus datos manualmente o subir un CSV con tus mediciones.")
 
-    uploaded_file = st.file_uploader("Cargar CSV", type=["csv"])
+    modo = st.radio("Modo de entrada de datos:", ["Manual", "CSV"])
 
-    if uploaded_file is not None:
-        import pandas as pd
-        df = pd.read_csv(uploaded_file)
-        st.write("Vista previa del CSV:")
-        st.dataframe(df.head())
+    import numpy as np
+    import matplotlib.pyplot as plt
+    import pandas as pd
 
-        # Selección de columnas
-        col1, col2, col3, col4 = st.columns(4)
-        with col1:
-            x_col = st.selectbox("Columna X (variable independiente)", df.columns)
-        with col2:
-            y_col = st.selectbox("Columna Y (variable dependiente)", df.columns)
-        with col3:
-            dx_col = st.selectbox("Columna ΔX (opcional)", [None]+list(df.columns))
-        with col4:
-            dy_col = st.selectbox("Columna ΔY (opcional)", [None]+list(df.columns))
+    if modo == "Manual":
+        n_puntos = st.number_input("Número de puntos", min_value=2, value=4, step=1)
 
-        if st.button("Generar gráfica"):
-            import matplotlib.pyplot as plt
-            import numpy as np
+        datos = []
+        for i in range(int(n_puntos)):
+            col1, col2, col3, col4 = st.columns(4)
+            with col1:
+                x = st.number_input(f"x{i+1}", value=float(i+1), key=f"x{i}")
+            with col2:
+                dx = st.number_input(f"Δx{i+1}", value=0.0, key=f"dx{i}")
+            with col3:
+                y = st.number_input(f"y{i+1}", value=float(i+2), key=f"y{i}")
+            with col4:
+                dy = st.number_input(f"Δy{i+1}", value=0.1, key=f"dy{i}")
+            datos.append((x, dx, y, dy))
 
-            xs = df[x_col].values
-            ys = df[y_col].values
-            dxs = df[dx_col].values if dx_col is not None else np.zeros_like(xs)
-            dys = df[dy_col].values if dy_col is not None else np.zeros_like(ys)
+        if st.button("Generar gráfica manual"):
+            xs = np.array([d[0] for d in datos])
+            dxs = np.array([d[1] for d in datos])
+            ys = np.array([d[2] for d in datos])
+            dys = np.array([d[3] for d in datos])
 
             fig, ax = plt.subplots()
             ax.errorbar(xs, ys, xerr=dxs, yerr=dys, fmt='o-', capsize=4, ecolor='black', color='tab:blue', label='Datos experimentales')
-            ax.set_xlabel("Variable independiente (X)")
-            ax.set_ylabel("Variable dependiente (Y)")
+            ax.set_xlabel("X")
+            ax.set_ylabel("Y")
             ax.set_title("Gráfico con barras de error")
             ax.legend()
             ax.grid(True)
-
             st.pyplot(fig)
-
             st.info("La línea une los puntos medidos y los palitos representan las incertidumbres.")
+
+    elif modo == "CSV":
+        uploaded_file = st.file_uploader("Cargar CSV", type=["csv"])
+        if uploaded_file is not None:
+            df = pd.read_csv(uploaded_file)
+            st.write("Vista previa del CSV:")
+            st.dataframe(df.head())
+
+            # Selección de columnas en orden X, ΔX, Y, ΔY
+            col1, col2, col3, col4 = st.columns(4)
+            with col1:
+                x_col = st.selectbox("X (variable independiente)", df.columns)
+            with col2:
+                dx_col = st.selectbox("ΔX (opcional)", [None] + list(df.columns))
+            with col3:
+                y_col = st.selectbox("Y (variable dependiente)", df.columns)
+            with col4:
+                dy_col = st.selectbox("ΔY (opcional)", [None] + list(df.columns))
+
+            if st.button("Generar gráfica desde CSV"):
+                xs = df[x_col].values
+                dxs = df[dx_col].values if dx_col is not None else np.zeros_like(xs)
+                ys = df[y_col].values
+                dys = df[dy_col].values if dy_col is not None else np.zeros_like(ys)
+
+                fig, ax = plt.subplots()
+                ax.errorbar(xs, ys, xerr=dxs, yerr=dys, fmt='o-', capsize=4, ecolor='black', color='tab:blue', label='Datos experimentales')
+                ax.set_xlabel("X")
+                ax.set_ylabel("Y")
+                ax.set_title("Gráfico con barras de error")
+                ax.legend()
+                ax.grid(True)
+                st.pyplot(fig)
+                st.info("La línea une los puntos medidos y los palitos representan las incertidumbres.")
+
