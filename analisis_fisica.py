@@ -530,44 +530,46 @@ with tab2:
             st.error(f"Error al calcular: {e}")
             st.write("Verifica que la función esté correctamente escrita y que uses los símbolos definidos.")
 with tab3:
-    st.header("Gráficas automáticas con incertidumbres")
+    st.header("Gráficas automáticas con incertidumbres desde CSV")
 
-    st.write("Introduce tus datos experimentales. La variable X es la independiente (abscisas) y la Y la dependiente (ordenadas).")
+    st.write("Sube un archivo CSV con tus datos experimentales y selecciona qué columnas usar.")
 
-    n_puntos = st.number_input("Número de puntos", min_value=2, value=4, step=1)
+    uploaded_file = st.file_uploader("Cargar CSV", type=["csv"])
 
-    st.subheader("Introduce los valores y sus incertidumbres")
-    datos = []
-    for i in range(int(n_puntos)):
+    if uploaded_file is not None:
+        import pandas as pd
+        df = pd.read_csv(uploaded_file)
+        st.write("Vista previa del CSV:")
+        st.dataframe(df.head())
+
+        # Selección de columnas
         col1, col2, col3, col4 = st.columns(4)
         with col1:
-            x = st.number_input(f"x{i+1}", value=float(i+1), key=f"x{i}")
+            x_col = st.selectbox("Columna X (variable independiente)", df.columns)
         with col2:
-            y = st.number_input(f"y{i+1}", value=float(i+2), key=f"y{i}")
+            y_col = st.selectbox("Columna Y (variable dependiente)", df.columns)
         with col3:
-            dx = st.number_input(f"Δx{i+1}", value=0.0, key=f"dx{i}")
+            dx_col = st.selectbox("Columna ΔX (opcional)", [None]+list(df.columns))
         with col4:
-            dy = st.number_input(f"Δy{i+1}", value=0.1, key=f"dy{i}")
-        datos.append((x, y, dx, dy))
+            dy_col = st.selectbox("Columna ΔY (opcional)", [None]+list(df.columns))
 
-    if st.button("Generar gráfica"):
-        import matplotlib.pyplot as plt
-        import numpy as np
+        if st.button("Generar gráfica"):
+            import matplotlib.pyplot as plt
+            import numpy as np
 
-        xs = np.array([d[0] for d in datos])
-        ys = np.array([d[1] for d in datos])
-        dxs = np.array([d[2] for d in datos])
-        dys = np.array([d[3] for d in datos])
+            xs = df[x_col].values
+            ys = df[y_col].values
+            dxs = df[dx_col].values if dx_col is not None else np.zeros_like(xs)
+            dys = df[dy_col].values if dy_col is not None else np.zeros_like(ys)
 
-        fig, ax = plt.subplots()
-        ax.errorbar(xs, ys, xerr=dxs, yerr=dys, fmt='o-', capsize=4, ecolor='black', color='tab:blue', label='Datos experimentales')
-        ax.set_xlabel("Variable independiente (X)")
-        ax.set_ylabel("Variable dependiente (Y)")
-        ax.set_title("Gráfico con barras de error")
-        ax.legend()
-        ax.grid(True)
+            fig, ax = plt.subplots()
+            ax.errorbar(xs, ys, xerr=dxs, yerr=dys, fmt='o-', capsize=4, ecolor='black', color='tab:blue', label='Datos experimentales')
+            ax.set_xlabel("Variable independiente (X)")
+            ax.set_ylabel("Variable dependiente (Y)")
+            ax.set_title("Gráfico con barras de error")
+            ax.legend()
+            ax.grid(True)
 
-        st.pyplot(fig)
+            st.pyplot(fig)
 
-        st.info("La línea une los puntos medidos y los palitos representan las incertidumbres.")
-            
+            st.info("La línea une los puntos medidos y los palitos representan las incertidumbres.")
