@@ -15,4 +15,4 @@ six==1.17.0
 tzdata==2025.2
 scipy
 sympy
-antlr4-python3-runtime
+antlr4-python3-runtime==4.11
