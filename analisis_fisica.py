@@ -54,7 +54,7 @@ with tab1:
     with col1:
         num_variables = st.number_input("Número de variables a analizar", min_value=1, max_value=5, value=2, step=1)
     with col2:
-        num_mediciones = st.number_input("Número de mediciones por variable", min_value=5, max_value=50, value=20, step=1)
+        num_mediciones = st.number_input("Número de mediciones por variable", min_value=5, max_value=50, value=5, step=1)
 
     # Sección para ingresar datos
     st.header("Ingreso de Datos")
@@ -73,7 +73,7 @@ with tab1:
         incerteza_instrumental = st.number_input(
             f"Incerteza instrumental para {variable_name} (ej: precisión del instrumento)",
             min_value=0.0,
-            value=0.01,
+            value=0.0,
             format=f"%.{st.session_state.precision}f",
             key=f"incert_{i}"
         )
@@ -85,17 +85,20 @@ with tab1:
         
         # Opción para cargar datos desde un archivo CSV
         use_csv = st.checkbox(f"Cargar datos desde CSV para {variable_name}", key=f"csv_{i}")
-        
         if use_csv:
             uploaded_file = st.file_uploader(f"Cargar CSV para {variable_name}", type=["csv"], key=f"file_{i}")
             if uploaded_file is not None:
                 try:
                     df = pd.read_csv(uploaded_file)
+                    # ⚡ Vista previa del CSV
+                    st.write(f"Vista previa de los datos para {variable_name}:")
+                    st.dataframe(df.head())  # solo primeras 5 filas
+            
                     if len(df.columns) > 0:
                         selected_column = st.selectbox(f"Seleccionar columna para {variable_name}", df.columns, key=f"col_{i}")
                         data[variable_name]["valores"] = df[selected_column].values[:num_mediciones].tolist()
-                        # Mostrar los datos cargados
-                        st.write(f"Datos cargados para {variable_name}:", data[variable_name]["valores"])
+                        # Mostrar los datos cargados (opcional)
+                        st.write(f"Datos seleccionados para {variable_name}:", data[variable_name]["valores"])
                 except Exception as e:
                     st.error(f"Error al cargar el archivo: {e}")
         else:
