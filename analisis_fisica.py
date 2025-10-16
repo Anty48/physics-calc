@@ -550,14 +550,15 @@ with tab2:
 with tab3:
     st.header("Gráficas automáticas con incertidumbres")
 
-    st.write("Puedes introducir tus datos manualmente o subir un CSV con tus mediciones.")
-
-    modo = st.radio("Modo de entrada de datos:", ["Manual", "CSV"])
+    st.write("Puedes introducir tus datos manualmente o subir un CSV con tus mediciones. También puedes superponer varias gráficas para comparar.")
 
     import numpy as np
     import matplotlib.pyplot as plt
     import pandas as pd
 
+    modo = st.radio("Modo de entrada de datos:", ["Manual", "CSV"])
+
+    # --- MODO MANUAL ---
     if modo == "Manual":
         n_puntos = st.number_input("Número de puntos", min_value=2, value=4, step=1)
 
@@ -581,7 +582,8 @@ with tab3:
             dys = np.array([d[3] for d in datos])
 
             fig, ax = plt.subplots()
-            ax.errorbar(xs, ys, xerr=dxs, yerr=dys, fmt='o-', capsize=4, ecolor='black', color='tab:blue', label='Datos experimentales')
+            ax.errorbar(xs, ys, xerr=dxs, yerr=dys, fmt='o-', capsize=4,
+                        ecolor='black', color='tab:blue', label='Datos experimentales')
             ax.set_xlabel("X")
             ax.set_ylabel("Y")
             ax.set_title("Gráfico con barras de error")
@@ -590,6 +592,7 @@ with tab3:
             st.pyplot(fig)
             st.info("La línea une los puntos medidos y los palitos representan las incertidumbres.")
 
+    # --- MODO CSV ---
     elif modo == "CSV":
         uploaded_file = st.file_uploader("Cargar CSV", type=["csv"])
         if uploaded_file is not None:
@@ -597,30 +600,39 @@ with tab3:
             st.write("Vista previa del CSV:")
             st.dataframe(df.head())
 
-            # Selección de columnas en orden X, ΔX, Y, ΔY
-            col1, col2, col3, col4 = st.columns(4)
-            with col1:
-                x_col = st.selectbox("X (variable independiente)", df.columns)
-            with col2:
-                dx_col = st.selectbox("ΔX (opcional)", [None] + list(df.columns))
-            with col3:
-                y_col = st.selectbox("Y (variable dependiente)", df.columns)
-            with col4:
-                dy_col = st.selectbox("ΔY (opcional)", [None] + list(df.columns))
+            n_graficas = st.number_input("Número de gráficas a superponer", min_value=1, value=1, step=1)
 
-            if st.button("Generar gráfica desde CSV"):
-                xs = df[x_col].values
-                dxs = df[dx_col].values if dx_col is not None else np.zeros_like(xs)
-                ys = df[y_col].values
-                dys = df[dy_col].values if dy_col is not None else np.zeros_like(ys)
+            fig, ax = plt.subplots()
 
-                fig, ax = plt.subplots()
-                ax.errorbar(xs, ys, xerr=dxs, yerr=dys, fmt='o-', capsize=4, ecolor='black', color='tab:blue', label='Datos experimentales')
+            colores = plt.cm.tab10.colors  # paleta de colores
+
+            for i in range(int(n_graficas)):
+                st.subheader(f"Gráfica {i+1}")
+                col1, col2, col3, col4 = st.columns(4)
+                with col1:
+                    x_col = st.selectbox(f"X (Gráfica {i+1})", df.columns, key=f"x_col_{i}")
+                with col2:
+                    dx_col = st.selectbox(f"ΔX (Gráfica {i+1})", [None] + list(df.columns), key=f"dx_col_{i}")
+                with col3:
+                    y_col = st.selectbox(f"Y (Gráfica {i+1})", df.columns, key=f"y_col_{i}")
+                with col4:
+                    dy_col = st.selectbox(f"ΔY (Gráfica {i+1})", [None] + list(df.columns), key=f"dy_col_{i}")
+
+                if st.button(f"Añadir gráfica {i+1}"):
+                    xs = df[x_col].values
+                    dxs = df[dx_col].values if dx_col is not None else np.zeros_like(xs)
+                    ys = df[y_col].values
+                    dys = df[dy_col].values if dy_col is not None else np.zeros_like(ys)
+
+                    ax.errorbar(xs, ys, xerr=dxs, yerr=dys, fmt='o-', capsize=4,
+                                ecolor='black', color=colores[i % len(colores)],
+                                label=f"Gráfica {i+1}")
+
+            if st.button("Mostrar todas las gráficas"):
                 ax.set_xlabel("X")
                 ax.set_ylabel("Y")
-                ax.set_title("Gráfico con barras de error")
+                ax.set_title("Gráfico con múltiples conjuntos de datos")
                 ax.legend()
                 ax.grid(True)
                 st.pyplot(fig)
-                st.info("La línea une los puntos medidos y los palitos representan las incertidumbres.")
-
+                st.info("Cada color representa un conjunto de datos distinto con sus incertidumbres.")
