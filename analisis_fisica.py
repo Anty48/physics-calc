@@ -592,7 +592,6 @@ with tab3:
             st.pyplot(fig)
             st.info("La línea une los puntos medidos y los palitos representan las incertidumbres.")
 
-    # --- MODO CSV ---
     elif modo == "CSV":
         uploaded_file = st.file_uploader("Cargar CSV", type=["csv"])
         if uploaded_file is not None:
@@ -602,7 +601,10 @@ with tab3:
 
             n_graficas = st.number_input("Número de gráficas a superponer", min_value=1, value=1, step=1)
 
-            # Guarda las selecciones en el estado de la sesión para que no se pierdan
+            # Barra para seleccionar cuántos puntos usar
+            n_puntos = st.slider("Número de puntos a usar por gráfica", min_value=2, max_value=len(df), value=min(10, len(df)))
+
+            # Inicializar la lista de gráficas si no existe
             if "graficas" not in st.session_state:
                 st.session_state.graficas = []
 
@@ -621,10 +623,10 @@ with tab3:
                     dy_col = st.selectbox(f"ΔY (Gráfica {i+1})", [None] + list(df.columns), key=f"dy_col_{i}")
 
                 if st.button(f"Añadir gráfica {i+1}"):
-                    xs = df[x_col].values
-                    dxs = df[dx_col].values if dx_col is not None else np.zeros_like(xs)
-                    ys = df[y_col].values
-                    dys = df[dy_col].values if dy_col is not None else np.zeros_like(ys)
+                    xs = df[x_col].values[:n_puntos]
+                    dxs = df[dx_col].values[:n_puntos] if dx_col is not None else np.zeros(n_puntos)
+                    ys = df[y_col].values[:n_puntos]
+                    dys = df[dy_col].values[:n_puntos] if dy_col is not None else np.zeros(n_puntos)
 
                     st.session_state.graficas.append({
                         "xs": xs,
