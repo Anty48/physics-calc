@@ -612,6 +612,10 @@ with tab3:
 
             for i in range(int(n_graficas)):
                 st.subheader(f"Gráfica {i+1}")
+
+                # Barra para poner nombre a la gráfica
+                graf_label = st.text_input(f"Nombre de la gráfica {i+1}", value=f"Gráfica {i+1}", key=f"label_{i}")
+
                 col1, col2, col3, col4 = st.columns(4)
                 with col1:
                     x_col = st.selectbox(f"X (Gráfica {i+1})", df.columns, key=f"x_col_{i}")
@@ -634,9 +638,10 @@ with tab3:
                         "ys": ys,
                         "dys": dys,
                         "color": colores[i % len(colores)],
-                        "label": f"Gráfica {i+1}"
+                        "label": graf_label  # usamos el nombre introducido
                     })
-                    st.success(f"Gráfica {i+1} añadida correctamente ✅")
+                    st.success(f"Gráfica '{graf_label}' añadida correctamente ✅")
+
 
             if st.button("Mostrar todas las gráficas"):
                 if len(st.session_state.graficas) == 0:
