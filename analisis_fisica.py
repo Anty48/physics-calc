@@ -602,9 +602,11 @@ with tab3:
 
             n_graficas = st.number_input("Número de gráficas a superponer", min_value=1, value=1, step=1)
 
-            fig, ax = plt.subplots()
+            # Guarda las selecciones en el estado de la sesión para que no se pierdan
+            if "graficas" not in st.session_state:
+                st.session_state.graficas = []
 
-            colores = plt.cm.tab10.colors  # paleta de colores
+            colores = plt.cm.tab10.colors
 
             for i in range(int(n_graficas)):
                 st.subheader(f"Gráfica {i+1}")
@@ -624,15 +626,31 @@ with tab3:
                     ys = df[y_col].values
                     dys = df[dy_col].values if dy_col is not None else np.zeros_like(ys)
 
-                    ax.errorbar(xs, ys, xerr=dxs, yerr=dys, fmt='o-', capsize=4,
-                                ecolor='black', color=colores[i % len(colores)],
-                                label=f"Gráfica {i+1}")
+                    st.session_state.graficas.append({
+                        "xs": xs,
+                        "dxs": dxs,
+                        "ys": ys,
+                        "dys": dys,
+                        "color": colores[i % len(colores)],
+                        "label": f"Gráfica {i+1}"
+                    })
+                    st.success(f"Gráfica {i+1} añadida correctamente ✅")
 
             if st.button("Mostrar todas las gráficas"):
-                ax.set_xlabel("X")
-                ax.set_ylabel("Y")
-                ax.set_title("Gráfico con múltiples conjuntos de datos")
-                ax.legend()
-                ax.grid(True)
-                st.pyplot(fig)
-                st.info("Cada color representa un conjunto de datos distinto con sus incertidumbres.")
+                if len(st.session_state.graficas) == 0:
+                    st.warning("Primero añade al menos una gráfica.")
+                else:
+                    fig, ax = plt.subplots()
+                    for g in st.session_state.graficas:
+                        ax.errorbar(
+                            g["xs"], g["ys"], xerr=g["dxs"], yerr=g["dys"],
+                            fmt='o-', capsize=4, ecolor='black',
+                            color=g["color"], label=g["label"]
+                        )
+                    ax.set_xlabel("X")
+                    ax.set_ylabel("Y")
+                    ax.set_title("Gráfico con múltiples conjuntos de datos")
+                    ax.legend()
+                    ax.grid(True)
+                    st.pyplot(fig)
+                    st.info("Cada color representa un conjunto de datos distinto con sus incertidumbres.")
