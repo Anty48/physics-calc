@@ -695,7 +695,7 @@ with tab3:
         if st.button("Borrar todas las gráficas"):
             st.session_state.graficas = []
             st.error("Se han borrado todas las gráficas de la memoria 🗑️")
-with st.tab4("Modificación de Datos"):
+with tab4:
     st.header("Modificación masiva de datos desde CSV")
     st.write("Carga un CSV y aplica operaciones sobre columnas completas.")
 
