@@ -41,7 +41,7 @@ with st.sidebar:
         st.experimental_rerun()
 
 # Crear las dos pestañas principales
-tab1, tab2, tab3, tab4 = st.tabs(["Análisis de Datos y Regresión", "Calculadora de Incertidumbres Combinadas", "Gráficas automáticas","Modificación de datos"])
+tab1, tab2, tab3, tab4, tab5= st.tabs(["Análisis de Datos y Regresión", "Calculadora de Incertidumbres Combinadas", "Gráficas automáticas","Modificación de datos","Formulario y traducción a Python"])
 
 # Contenido de la primera pestaña: Análisis de Datos y Regresión
 with tab1:
@@ -792,3 +792,172 @@ with tab4:
         # Botón para descargar CSV final
         csv_bytes = st.session_state.df_mod.to_csv(index=False).encode('utf-8')
         st.download_button("Descargar CSV final", csv_bytes, "datos_modificados.csv", "text/csv")
+with tab5:
+    st.title("Formulario de Estadística, Regresiones, Incertidumbres y Funciones Python")
+
+    st.header("1️⃣ Estadística Descriptiva")
+    st.write("""
+    Para un conjunto de datos \(x_1, x_2, ..., x_n\):
+    """)
+    st.latex(r"""
+    \text{Media: } \bar{x} = \frac{1}{n} \sum_{i=1}^{n} x_i
+    """)
+    st.latex(r"""
+    \text{Varianza muestral: } s^2 = \frac{1}{n-1} \sum_{i=1}^{n} (x_i - \bar{x})^2
+    """)
+    st.latex(r"""
+    \text{Desviación estándar muestral: } s = \sqrt{s^2}
+    """)
+    st.latex(r"""
+    \text{Error estándar de la media: } \sigma_{\bar{x}} = \frac{s}{\sqrt{n}}
+    """)
+
+    st.subheader("Traducción Python:")
+    st.code("""
+import numpy as np
+
+x = np.array([x1, x2, ..., xn])
+media = np.mean(x)
+desviacion = np.std(x, ddof=1)
+error_estandar = desviacion / np.sqrt(len(x))
+""", language="python")
+
+    st.header("2️⃣ Regresión Lineal Simple")
+    st.write("Para datos \((x_i, y_i)\), la regresión lineal y = m x + b:")
+    st.latex(r"""
+    m = \frac{ \sum_i (x_i - \bar{x})(y_i - \bar{y}) }{ \sum_i (x_i - \bar{x})^2 }
+    """)
+    st.latex(r"""
+    b = \bar{y} - m \bar{x}
+    """)
+    st.latex(r"""
+    r = \frac{ \sum_i (x_i - \bar{x})(y_i - \bar{y}) }{ \sqrt{ \sum_i (x_i - \bar{x})^2 \sum_i (y_i - \bar{y})^2 } }
+    """)
+    st.latex(r"""
+    R^2 = r^2
+    """)
+
+    st.subheader("Errores estándar de m y b")
+    st.latex(r"""
+    \text{SEE (error estándar de estimación)}: \text{SEE} = \sqrt{ \frac{\sum_i (y_i - (m x_i + b))^2}{n-2} }
+    """)
+    st.latex(r"""
+    s_m = \frac{\text{SEE}}{\sqrt{\sum_i (x_i - \bar{x})^2}}, \quad
+    s_b = \text{SEE} \sqrt{ \frac{\sum_i x_i^2}{n \sum_i (x_i - \bar{x})^2} }
+    """)
+
+    st.subheader("Traducción Python:")
+    st.code("""
+from scipy import stats
+slope, intercept, r_value, p_value, std_err = stats.linregress(x, y)
+# Error estándar calculado manualmente
+y_pred = slope*x + intercept
+residuos = y - y_pred
+see = np.sqrt(np.sum(residuos**2)/(len(x)-2))
+sd_slope = see / np.sqrt(np.sum((x - np.mean(x))**2))
+sd_intercept = see * np.sqrt(np.sum(x**2)/(len(x) * np.sum((x - np.mean(x))**2)))
+""", language="python")
+
+    st.header("3️⃣ Incertidumbres Combinadas (Propagación de errores)")
+    st.write("Para una función \(f(x_1, x_2, ..., x_n)\) con incertidumbres \(u_{x_i}\):")
+    st.latex(r"""
+    u_c = \sqrt{ \sum_{i=1}^{n} \left( \frac{\partial f}{\partial x_i} \cdot u_{x_i} \right)^2 }
+    """)
+
+    st.subheader("Traducción Python:")
+    st.code("""
+import sympy as sp
+
+# Definir símbolos
+x, y = sp.symbols('x y')
+f = x**2 + y
+dx = 0.1
+dy = 0.2
+
+# Derivadas parciales
+df_dx = sp.diff(f, x)
+df_dy = sp.diff(f, y)
+
+# Evaluación
+valores = {x:1, y:2}
+df_dx_val = float(df_dx.evalf(subs=valores))
+df_dy_val = float(df_dy.evalf(subs=valores))
+
+# Incertidumbre combinada
+u_c = np.sqrt((df_dx_val*dx)**2 + (df_dy_val*dy)**2)
+""", language="python")
+
+    st.header("4️⃣ Operaciones estadísticas comunes")
+    st.write("""
+- Suma de elementos: \(\sum_i x_i\)  
+- Producto de elementos: \(\prod_i x_i\)  
+- Media ponderada: \(\bar{x}_w = \frac{\sum_i w_i x_i}{\sum_i w_i}\)  
+- Desviación estándar ponderada: \(s_w = \sqrt{\frac{\sum_i w_i (x_i - \bar{x}_w)^2}{\sum_i w_i}}\)  
+- Percentiles: \(P_k\) tal que k% de datos son menores que Pk
+""")
+    st.subheader("Traducción Python:")
+    st.code("""
+# Suma y producto
+total = np.sum(x)
+producto = np.prod(x)
+
+# Media ponderada
+pesos = np.array([w1, w2, ..., wn])
+media_ponderada = np.average(x, weights=pesos)
+desv_ponderada = np.sqrt(np.average((x - media_ponderada)**2, weights=pesos))
+
+# Percentiles
+p25 = np.percentile(x, 25)
+p50 = np.percentile(x, 50) # mediana
+p75 = np.percentile(x, 75)
+""", language="python")
+
+    st.header("5️⃣ Funciones matemáticas y equivalentes en Python/Numpy")
+    st.write("Aquí tienes una guía rápida para traducir fórmulas matemáticas a Python:")
+
+    st.markdown("""
+| Función | Fórmula | Python |
+|---------|---------|--------|
+| Suma | Σx_i | np.sum(x) |
+| Producto | Πx_i | np.prod(x) |
+| Potencia | x^n | x**n |
+| Raíz cuadrada | √x | np.sqrt(x) |
+| Exponencial | e^x | np.exp(x) |
+| Logaritmo natural | ln(x) | np.log(x) |
+| Logaritmo base 10 | log₁₀(x) | np.log10(x) |
+| Seno | sin(x) | np.sin(x) |
+| Coseno | cos(x) | np.cos(x) |
+| Tangente | tan(x) | np.tan(x) |
+| Arco seno | arcsin(x) | np.arcsin(x) |
+| Arco coseno | arccos(x) | np.arccos(x) |
+| Arco tangente | arctan(x) | np.arctan(x) |
+| Valor absoluto | |x| | np.abs(x) |
+| Redondeo | round(x, n) | round(x, n) |
+| Máximo | max(x) | np.max(x) |
+| Mínimo | min(x) | np.min(x) |
+""")
+
+    st.header("6️⃣ Funciones estadísticas avanzadas en Python")
+    st.write("""
+- Covarianza: medida de relación lineal entre dos variables  
+- Correlación: cov(x,y) / (σx σy)  
+- Regresión polinómica: ajuste de grado n  
+- Histogramas y densidades  
+- Ajuste de curvas con scipy.optimize.curve_fit
+""")
+    st.subheader("Ejemplo en Python:")
+    st.code("""
+# Covarianza y correlación
+cov_matrix = np.cov(x, y)
+r = np.corrcoef(x, y)[0,1]
+
+# Ajuste polinómico
+coef = np.polyfit(x, y, deg=2)  # polinomio de grado 2
+y_fit = np.polyval(coef, x)
+
+# Histograma
+plt.hist(x, bins=10)
+plt.show()
+""", language="python")
+
+    st.info("Este formulario está pensado como referencia rápida dentro de la calculadora. Puedes ampliarlo añadiendo nuevas fórmulas o traducciones según tus necesidades.")
