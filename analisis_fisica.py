@@ -41,7 +41,7 @@ with st.sidebar:
         st.experimental_rerun()
 
 # Crear las dos pestañas principales
-tab1, tab2, tab3 = st.tabs(["Análisis de Datos y Regresión", "Calculadora de Incertidumbres Combinadas", "Gráficas automáticas"])
+tab1, tab2, tab3, tab4 = st.tabs(["Análisis de Datos y Regresión", "Calculadora de Incertidumbres Combinadas", "Gráficas automáticas","Modificación de datos"])
 
 # Contenido de la primera pestaña: Análisis de Datos y Regresión
 with tab1:
@@ -695,3 +695,58 @@ with tab3:
         if st.button("Borrar todas las gráficas"):
             st.session_state.graficas = []
             st.error("Se han borrado todas las gráficas de la memoria 🗑️")
+with st.tab4("Modificación de Datos"):
+    st.header("Modificación masiva de datos desde CSV")
+    st.write("Carga un CSV y aplica operaciones sobre columnas completas.")
+
+    uploaded_file = st.file_uploader("Cargar CSV", type=["csv"], key="mod_csv")
+    
+    if uploaded_file is not None:
+        df = pd.read_csv(uploaded_file)
+        st.write("Vista previa del CSV:")
+        st.dataframe(df.head())
+
+        st.subheader("Operaciones disponibles")
+        col1, col2 = st.columns(2)
+
+        with col1:
+            # Selección de columnas a operar
+            selected_cols = st.multiselect("Selecciona columnas", df.columns)
+
+        with col2:
+            operation = st.selectbox("Selecciona operación", ["Sumar constante", "Multiplicar por constante", "Suma de columnas", "Resta de columnas", "Multiplicar columnas"])
+
+        if operation in ["Sumar constante", "Multiplicar por constante"]:
+            const_value = st.number_input("Valor de la constante", value=1.0, format=f"%.{st.session_state.precision}f")
+
+        if operation in ["Suma de columnas", "Resta de columnas", "Multiplicar columnas"]:
+            col_a = st.selectbox("Columna A", df.columns, key="colA")
+            col_b = st.selectbox("Columna B", df.columns, key="colB")
+            new_col_name = st.text_input("Nombre de la columna resultado", value=f"{col_a}_{operation}_{col_b}")
+
+        if st.button("Aplicar operación"):
+            df_mod = df.copy()
+            try:
+                if operation == "Sumar constante":
+                    for col in selected_cols:
+                        df_mod[col] += const_value
+                elif operation == "Multiplicar por constante":
+                    for col in selected_cols:
+                        df_mod[col] *= const_value
+                elif operation == "Suma de columnas":
+                    df_mod[new_col_name] = df_mod[col_a] + df_mod[col_b]
+                elif operation == "Resta de columnas":
+                    df_mod[new_col_name] = df_mod[col_a] - df_mod[col_b]
+                elif operation == "Multiplicar columnas":
+                    df_mod[new_col_name] = df_mod[col_a] * df_mod[col_b]
+
+                st.success("Operación aplicada ✅")
+                st.dataframe(df_mod.head())
+
+                # Botón para descargar el CSV modificado
+                csv = df_mod.to_csv(index=False).encode('utf-8')
+                st.download_button("Descargar CSV modificado", csv, "datos_modificados.csv", "text/csv")
+            except Exception as e:
+                st.error(f"Error aplicando operación: {e}")
+
+
