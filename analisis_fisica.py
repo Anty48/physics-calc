@@ -24,11 +24,10 @@ if 'precision' not in st.session_state:
 if 'active_tab' not in st.session_state:
     st.session_state.active_tab = 0
 if "theme" not in st.session_state:
-    st.session_state["theme"] = "light"
+    st.session_state["theme"] = "dark"
 
 st.title("Calculadora estadística")
 
-# Añadir control para la precisión
 # Sidebar
 with st.sidebar:
     st.header("Configuración Global")
@@ -46,8 +45,9 @@ with st.sidebar:
     
     # Botón para cambiar tema
     if st.button("Cambiar tema oscuro/claro"):
+        # Alterna tema y fuerza actualización
         st.session_state["theme"] = "dark" if st.session_state["theme"]=="light" else "light"
-        st.experimental_rerun()
+        st.experimental_rerun()  # recarga para aplicar cambio visual
     
     st.markdown("---")
     
@@ -68,7 +68,7 @@ with st.sidebar:
     st.markdown("- [Symbolab](https://www.symbolab.com/)")
     st.markdown("- [Fórmulas físicas](https://www.fisicalab.com/formulas)")
 
-# Aplicar tema visual (oscuro/claro)
+# Aplicar tema visual
 if st.session_state["theme"] == "dark":
     st.markdown(
         """
