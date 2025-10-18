@@ -23,8 +23,6 @@ if 'precision' not in st.session_state:
     st.session_state.precision = PRECISION
 if 'active_tab' not in st.session_state:
     st.session_state.active_tab = 0
-if "theme" not in st.session_state:
-    st.session_state["theme"] = "dark"
 
 st.title("Calculadora estadística")
 
@@ -40,11 +38,6 @@ with st.sidebar:
         value=st.session_state["precision"],
         step=1
     )
-    
-    st.markdown("---")
-    
-    # Botón para cambiar tema (solo dibujarlo aquí)
-    cambiar_tema = st.button("Cambiar tema oscuro/claro")
     
     st.markdown("---")
     
@@ -65,32 +58,6 @@ with st.sidebar:
     st.markdown("- [Symbolab](https://www.symbolab.com/)")
     st.markdown("- [Fórmulas físicas](https://www.fisicalab.com/formulas)")
 
-# **FUERA DEL SIDEBAR**: aplicar el cambio de tema si se pulsó
-if 'cambiar_tema' in locals() and cambiar_tema:
-    st.session_state["theme"] = "dark" if st.session_state["theme"]=="light" else "light"
-    st.experimental_rerun()  # recarga para aplicar cambios visuales
-
-# Aplicar tema visual
-if st.session_state["theme"] == "dark":
-    st.markdown(
-        """
-        <style>
-        .stApp { background-color: #0E1117; color: white; }
-        .stSidebar { background-color: #1A1C23; color: white; }
-        </style>
-        """,
-        unsafe_allow_html=True
-    )
-else:
-    st.markdown(
-        """
-        <style>
-        .stApp { background-color: white; color: black; }
-        .stSidebar { background-color: #F0F2F6; color: black; }
-        </style>
-        """,
-        unsafe_allow_html=True
-    )
 # Crear las dos pestañas principales
 tab1, tab2, tab3, tab4, tab5= st.tabs(["Análisis de Datos y Regresión", "Calculadora de Incertidumbres Combinadas", "Gráficas automáticas","Modificación de datos","Formulario y traducción a Python"])
 
