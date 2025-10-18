@@ -641,7 +641,7 @@ with tab3:
         func_str = st.text_input("Escribe la función y=f(x)", value="x**2 + 2*x")
         x_min = st.number_input("x mínimo", value=0.0)
         x_max = st.number_input("x máximo", value=10.0)
-        n_puntos = st.slider("Número de puntos a graficar", 10, 1000, 100)
+        n_puntos = st.slider("Número de puntos a graficar", 10, 50, 10)
 
         if st.button("Añadir función"):
             x_vals = np.linspace(x_min, x_max, n_puntos)
