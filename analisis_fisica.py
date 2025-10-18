@@ -555,9 +555,11 @@ with tab3:
     import matplotlib.pyplot as plt
     import pandas as pd
 
-    # Inicializar lista de gráficas si no existe
+    # Inicializar lista de gráficas y CSV persistente
     if "graficas" not in st.session_state:
         st.session_state.graficas = []
+    if "df_csv" not in st.session_state:
+        st.session_state.df_csv = None
 
     colores = plt.cm.tab10.colors
     modo = st.radio("Modo de entrada de datos:", ["Manual", "CSV", "Función"])
@@ -597,7 +599,10 @@ with tab3:
     elif modo == "CSV":
         uploaded_file = st.file_uploader("Cargar CSV", type=["csv"])
         if uploaded_file is not None:
-            df = pd.read_csv(uploaded_file)
+            st.session_state.df_csv = pd.read_csv(uploaded_file)
+
+        if st.session_state.df_csv is not None:
+            df = st.session_state.df_csv
             st.write("Vista previa del CSV:")
             st.dataframe(df.head())
 
@@ -661,7 +666,7 @@ with tab3:
             if len(st.session_state.graficas) == 0:
                 st.warning("Primero añade al menos una gráfica.")
             else:
-                fig, ax = plt.subplots()
+                fig, ax = plt.subplots(figsize=(8, 6))
                 titulos = []
                 for g in st.session_state.graficas:
                     ax.errorbar(
@@ -675,7 +680,7 @@ with tab3:
                 ax.set_title(" + ".join(titulos))
                 ax.legend()
                 ax.grid(True)
-                st.pyplot(fig)
+                st.pyplot(fig, use_container_width=True)
                 st.info("Cada color representa un conjunto de datos o función distinto con sus incertidumbres.")
 
     with colB:
@@ -690,4 +695,3 @@ with tab3:
         if st.button("Borrar todas las gráficas"):
             st.session_state.graficas = []
             st.error("Se han borrado todas las gráficas de la memoria 🗑️")
-
