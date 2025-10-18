@@ -43,11 +43,8 @@ with st.sidebar:
     
     st.markdown("---")
     
-    # Botón para cambiar tema
-    if st.button("Cambiar tema oscuro/claro"):
-        # Alterna tema y fuerza actualización
-        st.session_state["theme"] = "dark" if st.session_state["theme"]=="light" else "light"
-        st.experimental_rerun()  # recarga para aplicar cambio visual
+    # Botón para cambiar tema (solo dibujarlo aquí)
+    cambiar_tema = st.button("Cambiar tema oscuro/claro")
     
     st.markdown("---")
     
@@ -67,6 +64,11 @@ with st.sidebar:
     st.markdown("- [Desmos](https://www.desmos.com/calculator)")
     st.markdown("- [Symbolab](https://www.symbolab.com/)")
     st.markdown("- [Fórmulas físicas](https://www.fisicalab.com/formulas)")
+
+# **FUERA DEL SIDEBAR**: aplicar el cambio de tema si se pulsó
+if 'cambiar_tema' in locals() and cambiar_tema:
+    st.session_state["theme"] = "dark" if st.session_state["theme"]=="light" else "light"
+    st.experimental_rerun()  # recarga para aplicar cambios visuales
 
 # Aplicar tema visual
 if st.session_state["theme"] == "dark":
