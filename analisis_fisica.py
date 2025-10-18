@@ -48,16 +48,10 @@ with st.sidebar:
     st.markdown("[GeoGebra 3D](https://www.geogebra.org/3d)")
     st.markdown("[Calculadora de integrales](https://www.calculadora-de-integrales.com/)")
     st.markdown("[Calculadora de derivadas](https://www.calculadora-de-derivadas.com/)")
-    
-    st.markdown("---")
-    
-    # Recursos extra
-    st.subheader("Recursos extra")
-    st.markdown("- [WolframAlpha](https://www.wolframalpha.com/)")
-    st.markdown("- [Desmos](https://www.desmos.com/calculator)")
-    st.markdown("- [Symbolab](https://www.symbolab.com/)")
-    st.markdown("- [Fórmulas físicas](https://www.fisicalab.com/formulas)")
-
+    st.markdown("[WolframAlpha](https://www.wolframalpha.com/)")
+    st.markdown("[Desmos](https://www.desmos.com/calculator)")
+    st.markdown("[Symbolab](https://www.symbolab.com/)")
+   
 # Crear las dos pestañas principales
 tab1, tab2, tab3, tab4, tab5= st.tabs(["Análisis de Datos y Regresión", "Calculadora de Incertidumbres Combinadas", "Gráficas automáticas","Modificación de datos","Formulario y traducción a Python"])
 
