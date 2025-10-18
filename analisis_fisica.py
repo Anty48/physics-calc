@@ -549,22 +549,20 @@ with tab2:
             st.write("Verifica que la función esté correctamente escrita y que uses los símbolos definidos.")
 with tab3:
     st.header("Gráficas automáticas con incertidumbres y funciones")
-    st.write("Puedes introducir datos manuales, subir CSV o superponer funciones explícitas para comparar.")
+    st.write("Puedes introducir datos manualmente, subir un CSV o superponer funciones explícitas para comparar.")
 
     import numpy as np
     import matplotlib.pyplot as plt
     import pandas as pd
-
-    modo = st.radio("Modo de entrada de datos:", ["Manual", "CSV", "Función"])
 
     # Inicializar lista de gráficas si no existe
     if "graficas" not in st.session_state:
         st.session_state.graficas = []
 
     colores = plt.cm.tab10.colors
+    modo = st.radio("Modo de entrada de datos:", ["Manual", "CSV", "Función"])
 
-    superponer = st.checkbox("Superponer nuevas gráficas a las anteriores", value=False)
-
+    # --- MODO MANUAL ---
     if modo == "Manual":
         n_puntos = st.number_input("Número de puntos", min_value=2, value=4, step=1)
         graf_label = st.text_input("Nombre de la gráfica", value="Manual", key="manual_label")
@@ -583,9 +581,6 @@ with tab3:
             datos.append((x, dx, y, dy))
 
         if st.button("Añadir gráfica manual"):
-            if not superponer:
-                st.session_state.graficas = []
-
             xs = np.array([d[0] for d in datos])
             dxs = np.array([d[1] for d in datos])
             ys = np.array([d[2] for d in datos])
@@ -598,6 +593,7 @@ with tab3:
             })
             st.success(f"Gráfica '{graf_label}' añadida ✅")
 
+    # --- MODO CSV ---
     elif modo == "CSV":
         uploaded_file = st.file_uploader("Cargar CSV", type=["csv"])
         if uploaded_file is not None:
@@ -622,9 +618,6 @@ with tab3:
                     dy_col = st.selectbox(f"ΔY (Gráfica {i+1})", [None] + list(df.columns), key=f"dy_col_{i}")
 
                 if st.button(f"Añadir gráfica CSV {i+1}"):
-                    if not superponer:
-                        st.session_state.graficas = []
-
                     xs = df[x_col].values[:n_puntos]
                     dxs = df[dx_col].values[:n_puntos] if dx_col is not None else np.zeros(n_puntos)
                     ys = df[y_col].values[:n_puntos]
@@ -637,6 +630,7 @@ with tab3:
                     })
                     st.success(f"Gráfica '{graf_label}' añadida ✅")
 
+    # --- MODO FUNCIÓN ---
     elif modo == "Función":
         graf_label = st.text_input("Nombre de la función", value="Función", key="func_label")
         func_str = st.text_input("Escribe la función y=f(x)", value="x**2 + 2*x")
@@ -645,9 +639,6 @@ with tab3:
         n_puntos = st.slider("Número de puntos a graficar", 10, 1000, 100)
 
         if st.button("Añadir función"):
-            if not superponer:
-                st.session_state.graficas = []
-
             x_vals = np.linspace(x_min, x_max, n_puntos)
             try:
                 y_vals = np.array([eval(func_str, {"x": xv, "np": np}) for xv in x_vals])
@@ -661,23 +652,42 @@ with tab3:
             except Exception as e:
                 st.error(f"Error al evaluar la función: {e}")
 
-    # Botón para mostrar todas las gráficas acumuladas
-    if st.button("Mostrar todas las gráficas"):
-        if len(st.session_state.graficas) == 0:
-            st.warning("Primero añade al menos una gráfica.")
-        else:
-            fig, ax = plt.subplots()
-            titulos = []
-            for g in st.session_state.graficas:
-                ax.errorbar(g["xs"], g["ys"], xerr=g["dxs"], yerr=g["dys"],
-                            fmt='o-' if np.any(g["dxs"]+g["dys"]) else '-', capsize=4,
-                            ecolor='black', color=g["color"], label=g["label"])
-                titulos.append(g["label"])
-            ax.set_xlabel("X")
-            ax.set_ylabel("Y")
-            ax.set_title(" + ".join(titulos))
-            ax.legend()
-            ax.grid(True)
-            st.pyplot(fig)
-            st.info("Cada color representa un conjunto de datos o función distinto con sus incertidumbres.")
+    # --- CONTROLES DE VISUALIZACIÓN ---
+    st.divider()
+    colA, colB, colC = st.columns(3)
+
+    with colA:
+        if st.button("Mostrar todas las gráficas"):
+            if len(st.session_state.graficas) == 0:
+                st.warning("Primero añade al menos una gráfica.")
+            else:
+                fig, ax = plt.subplots()
+                titulos = []
+                for g in st.session_state.graficas:
+                    ax.errorbar(
+                        g["xs"], g["ys"], xerr=g["dxs"], yerr=g["dys"],
+                        fmt='o-' if np.any(g["dxs"] + g["dys"]) else '-',
+                        capsize=4, ecolor='black', color=g["color"], label=g["label"]
+                    )
+                    titulos.append(g["label"])
+                ax.set_xlabel("X")
+                ax.set_ylabel("Y")
+                ax.set_title(" + ".join(titulos))
+                ax.legend()
+                ax.grid(True)
+                st.pyplot(fig)
+                st.info("Cada color representa un conjunto de datos o función distinto con sus incertidumbres.")
+
+    with colB:
+        if st.button("Borrar última gráfica"):
+            if len(st.session_state.graficas) > 0:
+                ultima = st.session_state.graficas.pop()
+                st.warning(f"Se ha borrado la última gráfica: '{ultima['label']}' ❌")
+            else:
+                st.warning("No hay gráficas que borrar.")
+
+    with colC:
+        if st.button("Borrar todas las gráficas"):
+            st.session_state.graficas = []
+            st.error("Se han borrado todas las gráficas de la memoria 🗑️")
 
