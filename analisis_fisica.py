@@ -696,57 +696,70 @@ with tab3:
             st.session_state.graficas = []
             st.error("Se han borrado todas las gráficas de la memoria 🗑️")
 with tab4:
-    st.header("Modificación masiva de datos desde CSV")
-    st.write("Carga un CSV y aplica operaciones sobre columnas completas.")
+    st.header("Editor avanzado de CSV")
+    st.write("Carga un CSV y aplica operaciones secuenciales sobre columnas. Puedes aplicar varias operaciones antes de descargar el resultado final.")
 
-    uploaded_file = st.file_uploader("Cargar CSV", type=["csv"], key="mod_csv")
-    
-    if uploaded_file is not None:
-        df = pd.read_csv(uploaded_file)
-        st.write("Vista previa del CSV:")
-        st.dataframe(df.head())
+    # Inicializar CSV modificado persistente
+    if "df_mod" not in st.session_state:
+        st.session_state.df_mod = None
 
-        st.subheader("Operaciones disponibles")
-        col1, col2 = st.columns(2)
+    uploaded_file = st.file_uploader("Cargar CSV", type=["csv"], key="mod_csv_adv")
 
-        with col1:
-            # Selección de columnas a operar
-            selected_cols = st.multiselect("Selecciona columnas", df.columns)
+    if uploaded_file is not None and st.session_state.df_mod is None:
+        st.session_state.df_mod = pd.read_csv(uploaded_file)
 
-        with col2:
-            operation = st.selectbox("Selecciona operación", ["Sumar constante", "Multiplicar por constante", "Suma de columnas", "Resta de columnas", "Multiplicar columnas"])
+    if st.session_state.df_mod is not None:
+        df_mod = st.session_state.df_mod
+        st.subheader("Vista previa del CSV actual")
+        st.dataframe(df_mod.head())
 
-        if operation in ["Sumar constante", "Multiplicar por constante"]:
+        st.subheader("Agregar operación")
+        cols = df_mod.columns.tolist()
+        operation_type = st.selectbox("Tipo de operación", 
+                                      ["Sumar constante", "Multiplicar por constante", 
+                                       "Suma columnas", "Resta columnas", "Multiplicar columnas",
+                                       "Aplicar función Python"])
+
+        # Parámetros para la operación
+        if operation_type in ["Sumar constante", "Multiplicar por constante"]:
+            selected_cols = st.multiselect("Columnas a modificar", cols)
             const_value = st.number_input("Valor de la constante", value=1.0, format=f"%.{st.session_state.precision}f")
-
-        if operation in ["Suma de columnas", "Resta de columnas", "Multiplicar columnas"]:
-            col_a = st.selectbox("Columna A", df.columns, key="colA")
-            col_b = st.selectbox("Columna B", df.columns, key="colB")
-            new_col_name = st.text_input("Nombre de la columna resultado", value=f"{col_a}_{operation}_{col_b}")
+        elif operation_type in ["Suma columnas", "Resta columnas", "Multiplicar columnas"]:
+            col_a = st.selectbox("Columna A", cols, key="colA_op")
+            col_b = st.selectbox("Columna B", cols, key="colB_op")
+            new_col_name = st.text_input("Nombre de la columna resultado", value=f"{col_a}_{operation_type}_{col_b}")
+        elif operation_type == "Aplicar función Python":
+            selected_col = st.selectbox("Columna a transformar", cols)
+            func_str = st.text_input("Función Python", value="np.sqrt(x)", help="Usa 'x' como variable de la columna y 'np' para funciones numpy. Ej: np.sqrt(x)*2 + 5")
 
         if st.button("Aplicar operación"):
-            df_mod = df.copy()
             try:
-                if operation == "Sumar constante":
+                df_mod_copy = df_mod.copy()
+                if operation_type == "Sumar constante":
                     for col in selected_cols:
-                        df_mod[col] += const_value
-                elif operation == "Multiplicar por constante":
+                        df_mod_copy[col] += const_value
+                elif operation_type == "Multiplicar por constante":
                     for col in selected_cols:
-                        df_mod[col] *= const_value
-                elif operation == "Suma de columnas":
-                    df_mod[new_col_name] = df_mod[col_a] + df_mod[col_b]
-                elif operation == "Resta de columnas":
-                    df_mod[new_col_name] = df_mod[col_a] - df_mod[col_b]
-                elif operation == "Multiplicar columnas":
-                    df_mod[new_col_name] = df_mod[col_a] * df_mod[col_b]
-
+                        df_mod_copy[col] *= const_value
+                elif operation_type == "Suma columnas":
+                    df_mod_copy[new_col_name] = df_mod_copy[col_a] + df_mod_copy[col_b]
+                elif operation_type == "Resta columnas":
+                    df_mod_copy[new_col_name] = df_mod_copy[col_a] - df_mod_copy[col_b]
+                elif operation_type == "Multiplicar columnas":
+                    df_mod_copy[new_col_name] = df_mod_copy[col_a] * df_mod_copy[col_b]
+                elif operation_type == "Aplicar función Python":
+                    # Evaluar función segura usando eval con np y x
+                    df_mod_copy[selected_col] = df_mod_copy[selected_col].apply(lambda x: eval(func_str, {"x": x, "np": np}))
+                
+                # Guardar cambios en sesión
+                st.session_state.df_mod = df_mod_copy
                 st.success("Operación aplicada ✅")
-                st.dataframe(df_mod.head())
-
-                # Botón para descargar el CSV modificado
-                csv = df_mod.to_csv(index=False).encode('utf-8')
-                st.download_button("Descargar CSV modificado", csv, "datos_modificados.csv", "text/csv")
+                st.dataframe(df_mod_copy.head())
             except Exception as e:
                 st.error(f"Error aplicando operación: {e}")
+
+        # Botón para descargar CSV final
+        csv_bytes = st.session_state.df_mod.to_csv(index=False).encode('utf-8')
+        st.download_button("Descargar CSV final", csv_bytes, "datos_modificados.csv", "text/csv")
 
 
