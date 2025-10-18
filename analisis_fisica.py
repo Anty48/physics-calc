@@ -29,16 +29,44 @@ st.title("Calculadora estadística")
 # Añadir control para la precisión
 with st.sidebar:
     st.header("Configuración Global")
+    
+    # Slider de precisión
     precision = st.slider(
-        "Precisión (número de decimales)",
+        "Precisión (decimales)",
         min_value=2,
         max_value=10,
-        value=st.session_state.precision,
+        value=st.session_state.get('precision', 4),
         step=1
     )
-    if precision != st.session_state.precision:
-        st.session_state.precision = precision
-        st.experimental_rerun()
+    
+    st.markdown("---")
+    
+    # Botón para cambiar tema
+    if st.button("Cambiar tema oscuro/claro"):
+        # Esto cambia la variable de sesión y requiere reinicio para efectos visuales
+        current_theme = st.session_state.get("theme", "light")
+        st.session_state["theme"] = "dark" if current_theme == "light" else "light"
+        st.experimental_rerun()  # recarga la app para aplicar cambios
+    
+    st.markdown("---")
+    
+    # Enlaces útiles
+    st.subheader("Enlaces rápidos")
+    st.markdown("[ChatGPT](https://chat.openai.com/)")
+    st.markdown("[GeoGebra](https://www.geogebra.org/)")
+    st.markdown("[GeoGebra 3D](https://www.geogebra.org/3d)")
+    st.markdown("[Calculadora de integrales](https://www.calculadora-de-integrales.com/)")
+    st.markdown("[Calculadora de derivadas](https://www.calculadora-de-derivadas.com/)")
+
+    st.markdown("---")
+
+    # Ideas extra que podrías poner
+    st.subheader("Extras")
+    st.checkbox("Mostrar cuadrícula en gráficos", value=True)
+    st.checkbox("Activar animaciones")
+    st.selectbox("Color de gráficos", ["azul", "rojo", "verde", "naranja"])
+    st.number_input("Factor de escala de ejes", min_value=0.1, max_value=5.0, value=1.0, step=0.1)
+    st.text_input("Título de los gráficos", value="Mi gráfico")
 
 # Crear las dos pestañas principales
 tab1, tab2, tab3, tab4, tab5= st.tabs(["Análisis de Datos y Regresión", "Calculadora de Incertidumbres Combinadas", "Gráficas automáticas","Modificación de datos","Formulario y traducción a Python"])
