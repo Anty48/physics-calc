@@ -795,35 +795,34 @@ with tab4:
 with tab5:
     st.title("Formulario de Estadística, Regresiones, Incertidumbres y Funciones Python")
 
-st.header("1. Funciones Matemáticas y Equivalentes en Python/Numpy")
-st.write("Cada función en LaTeX y su traducción a Python:")
+    st.header("1. Funciones Matemáticas y Equivalentes en Python/Numpy")
+    st.write("Cada función en LaTeX y su traducción a Python:")
 
-funciones = [
-    (r"\sum x_i", "np.sum(x)"),
-    (r"\prod x_i", "np.prod(x)"),
-    (r"x^n", "x**n"),
-    (r"\sqrt{x}", "np.sqrt(x)"),
-    (r"e^x", "np.exp(x)"),
-    (r"\ln(x)", "np.log(x)"),
-    (r"\log_{10}(x)", "np.log10(x)"),
-    (r"\sin(x)", "np.sin(x)"),
-    (r"\cos(x)", "np.cos(x)"),
-    (r"\tan(x)", "np.tan(x)"),
-    (r"\arcsin(x)", "np.arcsin(x)"),
-    (r"\arccos(x)", "np.arccos(x)"),
-    (r"\arctan(x)", "np.arctan(x)"),
-    (r"|x|", "np.abs(x)"),
-    (r"\text{round}(x,n)", "round(x,n)"),
-    (r"\max(x)", "np.max(x)"),
-    (r"\min(x)", "np.min(x)")
-]
+    funciones = [
+        (r"\sum x_i", "np.sum(x)"),
+        (r"\prod x_i", "np.prod(x)"),
+        (r"x^n", "x**n"),
+        (r"\sqrt{x}", "np.sqrt(x)"),
+        (r"e^x", "np.exp(x)"),
+        (r"\ln(x)", "np.log(x)"),
+        (r"\log_{10}(x)", "np.log10(x)"),
+        (r"\sin(x)", "np.sin(x)"),
+        (r"\cos(x)", "np.cos(x)"),
+        (r"\tan(x)", "np.tan(x)"),
+        (r"\arcsin(x)", "np.arcsin(x)"),
+        (r"\arccos(x)", "np.arccos(x)"),
+        (r"\arctan(x)", "np.arctan(x)"),
+        (r"|x|", "np.abs(x)"),
+        (r"\text{round}(x,n)", "round(x,n)"),
+        (r"\max(x)", "np.max(x)"),
+        (r"\min(x)", "np.min(x)")
+    ]
 
-for latex_expr, python_expr in funciones:
-    st.markdown(f"**Función:**")
-    st.latex(latex_expr)
-    st.markdown(f"**Python:** `{python_expr}`")
-    st.write("---")
-
+    for latex_expr, python_expr in funciones:
+        st.markdown(f"**Función:**")
+        st.latex(latex_expr)
+        st.markdown(f"**Python:** `{python_expr}`")
+        st.write("---")
 
     st.header("2. Estadística Descriptiva")
     st.write("Para un conjunto de datos $x_1, x_2, ..., x_n$:")
