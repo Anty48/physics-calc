@@ -659,7 +659,7 @@ with tab3:
 
     # --- CONTROLES DE VISUALIZACIÓN ---
     st.divider()
-    colA, colB, colC = st.columns(4,1,1)
+    colA, colB, colC = st.columns([4,1,1])
 
     with colA:
         if st.button("Mostrar todas las gráficas"):
