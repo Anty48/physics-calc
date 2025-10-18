@@ -795,24 +795,14 @@ with tab4:
 with tab5:
     st.title("Formulario de Estadística, Regresiones, Incertidumbres y Funciones Python")
 
-    st.header("1️⃣ Estadística Descriptiva")
-    st.write("""
-    Para un conjunto de datos \(x_1, x_2, ..., x_n\):
-    """)
-    st.latex(r"""
-    \text{Media: } \bar{x} = \frac{1}{n} \sum_{i=1}^{n} x_i
-    """)
-    st.latex(r"""
-    \text{Varianza muestral: } s^2 = \frac{1}{n-1} \sum_{i=1}^{n} (x_i - \bar{x})^2
-    """)
-    st.latex(r"""
-    \text{Desviación estándar muestral: } s = \sqrt{s^2}
-    """)
-    st.latex(r"""
-    \text{Error estándar de la media: } \sigma_{\bar{x}} = \frac{s}{\sqrt{n}}
-    """)
+    st.header("1. Estadística Descriptiva")
+    st.write("Para un conjunto de datos x1, x2, ..., xn:")
+    st.latex(r"\text{Media: } \bar{x} = \frac{1}{n} \sum_{i=1}^{n} x_i")
+    st.latex(r"\text{Varianza muestral: } s^2 = \frac{1}{n-1} \sum_{i=1}^{n} (x_i - \bar{x})^2")
+    st.latex(r"\text{Desviación estándar muestral: } s = \sqrt{s^2}")
+    st.latex(r"\text{Error estándar de la media: } \sigma_{\bar{x}} = \frac{s}{\sqrt{n}}")
 
-    st.subheader("Traducción Python:")
+    st.subheader("Traducción a Python")
     st.code("""
 import numpy as np
 
@@ -822,31 +812,18 @@ desviacion = np.std(x, ddof=1)
 error_estandar = desviacion / np.sqrt(len(x))
 """, language="python")
 
-    st.header("2️⃣ Regresión Lineal Simple")
-    st.write("Para datos \((x_i, y_i)\), la regresión lineal y = m x + b:")
-    st.latex(r"""
-    m = \frac{ \sum_i (x_i - \bar{x})(y_i - \bar{y}) }{ \sum_i (x_i - \bar{x})^2 }
-    """)
-    st.latex(r"""
-    b = \bar{y} - m \bar{x}
-    """)
-    st.latex(r"""
-    r = \frac{ \sum_i (x_i - \bar{x})(y_i - \bar{y}) }{ \sqrt{ \sum_i (x_i - \bar{x})^2 \sum_i (y_i - \bar{y})^2 } }
-    """)
-    st.latex(r"""
-    R^2 = r^2
-    """)
+    st.header("2. Regresión Lineal Simple")
+    st.write("Para datos (xi, yi), la regresión lineal y = m x + b:")
+    st.latex(r"m = \frac{ \sum_i (x_i - \bar{x})(y_i - \bar{y}) }{ \sum_i (x_i - \bar{x})^2 }")
+    st.latex(r"b = \bar{y} - m \bar{x}")
+    st.latex(r"r = \frac{ \sum_i (x_i - \bar{x})(y_i - \bar{y}) }{ \sqrt{ \sum_i (x_i - \bar{x})^2 \sum_i (y_i - \bar{y})^2 } }")
+    st.latex(r"R^2 = r^2")
 
     st.subheader("Errores estándar de m y b")
-    st.latex(r"""
-    \text{SEE (error estándar de estimación)}: \text{SEE} = \sqrt{ \frac{\sum_i (y_i - (m x_i + b))^2}{n-2} }
-    """)
-    st.latex(r"""
-    s_m = \frac{\text{SEE}}{\sqrt{\sum_i (x_i - \bar{x})^2}}, \quad
-    s_b = \text{SEE} \sqrt{ \frac{\sum_i x_i^2}{n \sum_i (x_i - \bar{x})^2} }
-    """)
+    st.latex(r"\text{SEE (error estándar de estimación)} = \sqrt{ \frac{\sum_i (y_i - (m x_i + b))^2}{n-2} }")
+    st.latex(r"s_m = \frac{\text{SEE}}{\sqrt{\sum_i (x_i - \bar{x})^2}}, \quad s_b = \text{SEE} \sqrt{ \frac{\sum_i x_i^2}{n \sum_i (x_i - \bar{x})^2} }")
 
-    st.subheader("Traducción Python:")
+    st.subheader("Traducción a Python")
     st.code("""
 from scipy import stats
 slope, intercept, r_value, p_value, std_err = stats.linregress(x, y)
@@ -858,15 +835,14 @@ sd_slope = see / np.sqrt(np.sum((x - np.mean(x))**2))
 sd_intercept = see * np.sqrt(np.sum(x**2)/(len(x) * np.sum((x - np.mean(x))**2)))
 """, language="python")
 
-    st.header("3️⃣ Incertidumbres Combinadas (Propagación de errores)")
-    st.write("Para una función \(f(x_1, x_2, ..., x_n)\) con incertidumbres \(u_{x_i}\):")
-    st.latex(r"""
-    u_c = \sqrt{ \sum_{i=1}^{n} \left( \frac{\partial f}{\partial x_i} \cdot u_{x_i} \right)^2 }
-    """)
+    st.header("3. Incertidumbres Combinadas")
+    st.write("Para una función f(x1, x2, ..., xn) con incertidumbres u_xi:")
+    st.latex(r"u_c = \sqrt{ \sum_{i=1}^{n} \left( \frac{\partial f}{\partial x_i} \cdot u_{x_i} \right)^2 }")
 
-    st.subheader("Traducción Python:")
+    st.subheader("Traducción a Python")
     st.code("""
 import sympy as sp
+import numpy as np
 
 # Definir símbolos
 x, y = sp.symbols('x y')
@@ -887,15 +863,16 @@ df_dy_val = float(df_dy.evalf(subs=valores))
 u_c = np.sqrt((df_dx_val*dx)**2 + (df_dy_val*dy)**2)
 """, language="python")
 
-    st.header("4️⃣ Operaciones estadísticas comunes")
+    st.header("4. Operaciones estadísticas comunes")
     st.write("""
-- Suma de elementos: \(\sum_i x_i\)  
-- Producto de elementos: \(\prod_i x_i\)  
-- Media ponderada: \(\bar{x}_w = \frac{\sum_i w_i x_i}{\sum_i w_i}\)  
-- Desviación estándar ponderada: \(s_w = \sqrt{\frac{\sum_i w_i (x_i - \bar{x}_w)^2}{\sum_i w_i}}\)  
-- Percentiles: \(P_k\) tal que k% de datos son menores que Pk
+Suma de elementos: sum(xi)  
+Producto de elementos: prod(xi)  
+Media ponderada: x̄w = sum(wi*xi)/sum(wi)  
+Desviación estándar ponderada: sw = sqrt(sum(wi*(xi - x̄w)**2)/sum(wi))  
+Percentiles: Pk tal que k% de datos son menores que Pk
 """)
-    st.subheader("Traducción Python:")
+
+    st.subheader("Traducción a Python")
     st.code("""
 # Suma y producto
 total = np.sum(x)
@@ -912,19 +889,17 @@ p50 = np.percentile(x, 50) # mediana
 p75 = np.percentile(x, 75)
 """, language="python")
 
-    st.header("5️⃣ Funciones matemáticas y equivalentes en Python/Numpy")
-    st.write("Aquí tienes una guía rápida para traducir fórmulas matemáticas a Python:")
-
+    st.header("5. Funciones Matemáticas y Equivalentes en Python/Numpy")
     st.markdown("""
 | Función | Fórmula | Python |
 |---------|---------|--------|
-| Suma | Σx_i | np.sum(x) |
-| Producto | Πx_i | np.prod(x) |
+| Suma | Σxi | np.sum(x) |
+| Producto | Πxi | np.prod(x) |
 | Potencia | x^n | x**n |
 | Raíz cuadrada | √x | np.sqrt(x) |
 | Exponencial | e^x | np.exp(x) |
 | Logaritmo natural | ln(x) | np.log(x) |
-| Logaritmo base 10 | log₁₀(x) | np.log10(x) |
+| Logaritmo base 10 | log10(x) | np.log10(x) |
 | Seno | sin(x) | np.sin(x) |
 | Coseno | cos(x) | np.cos(x) |
 | Tangente | tan(x) | np.tan(x) |
@@ -937,15 +912,10 @@ p75 = np.percentile(x, 75)
 | Mínimo | min(x) | np.min(x) |
 """)
 
-    st.header("6️⃣ Funciones estadísticas avanzadas en Python")
-    st.write("""
-- Covarianza: medida de relación lineal entre dos variables  
-- Correlación: cov(x,y) / (σx σy)  
-- Regresión polinómica: ajuste de grado n  
-- Histogramas y densidades  
-- Ajuste de curvas con scipy.optimize.curve_fit
-""")
-    st.subheader("Ejemplo en Python:")
+    st.header("6. Funciones estadísticas avanzadas en Python")
+    st.write("Covarianza, correlación, ajuste polinómico, histogramas y densidades.")
+
+    st.subheader("Ejemplo en Python")
     st.code("""
 # Covarianza y correlación
 cov_matrix = np.cov(x, y)
@@ -956,8 +926,7 @@ coef = np.polyfit(x, y, deg=2)  # polinomio de grado 2
 y_fit = np.polyval(coef, x)
 
 # Histograma
+import matplotlib.pyplot as plt
 plt.hist(x, bins=10)
 plt.show()
 """, language="python")
-
-    st.info("Este formulario está pensado como referencia rápida dentro de la calculadora. Puedes ampliarlo añadiendo nuevas fórmulas o traducciones según tus necesidades.")
