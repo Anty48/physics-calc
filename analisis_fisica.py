@@ -795,6 +795,9 @@ with tab4:
 with tab5:
     st.title("Formulario de Estadística, Regresiones, Incertidumbres y Funciones Python")
 
+    # -------------------------------
+    # 1. Funciones Matemáticas
+    # -------------------------------
     st.header("1. Funciones Matemáticas y Equivalentes en Python/Numpy")
     st.write("Cada función en LaTeX y su traducción a Python:")
 
@@ -818,14 +821,28 @@ with tab5:
         (r"\min(x)", "np.min(x)")
     ]
 
-    for latex_expr, python_expr in funciones:
-        st.markdown(f"**Función:**")
-        st.latex(latex_expr)
-        st.markdown(f"**Python:** `{python_expr}`")
-        st.write("---")
+    # Encabezado de la "tabla"
+    col1, col2 = st.columns([1, 1])
+    with col1:
+        st.markdown("**Función (LaTeX)**")
+    with col2:
+        st.markdown("**Python**")
+    st.write("---")
 
+    # Filas de la tabla
+    for latex_expr, python_expr in funciones:
+        col1, col2 = st.columns([1, 1])
+        with col1:
+            st.latex(latex_expr)
+        with col2:
+            st.markdown(f"`{python_expr}`")
+        st.write("")
+
+    # -------------------------------
+    # 2. Estadística Descriptiva
+    # -------------------------------
     st.header("2. Estadística Descriptiva")
-    st.write("Para un conjunto de datos $x_1, x_2, ..., x_n$:")
+    st.write("Para un conjunto de datos $x_1, x_2, ..., x_n$:")    
     st.latex(r"\text{Media: } \bar{x} = \frac{1}{n} \sum_{i=1}^{n} x_i")
     st.latex(r"\text{Varianza muestral: } s^2 = \frac{1}{n-1} \sum_{i=1}^{n} (x_i - \bar{x})^2")
     st.latex(r"\text{Desviación estándar muestral: } s = \sqrt{s^2}")
@@ -840,28 +857,41 @@ desviacion = np.std(x, ddof=1)
 error_estandar = desviacion / np.sqrt(len(x))
 """, language="python")
 
+    # -------------------------------
+    # 3. Operaciones estadísticas comunes
+    # -------------------------------
     st.header("3. Operaciones estadísticas comunes")
     st.write("Estas son operaciones frecuentes en análisis de datos:")
-    st.latex(r"\text{Suma: } S = \sum_{i=1}^{n} x_i")
-    st.latex(r"\text{Producto: } P = \prod_{i=1}^{n} x_i")
-    st.latex(r"\text{Media ponderada: } \bar{x}_w = \frac{\sum_{i=1}^{n} w_i x_i}{\sum_{i=1}^{n} w_i}")
-    st.latex(r"\text{Desviación estándar ponderada: } s_w = \sqrt{ \frac{\sum_{i=1}^{n} w_i (x_i - \bar{x}_w)^2}{\sum_{i=1}^{n} w_i} }")
-    st.latex(r"\text{Percentiles: } P_k \text{ tal que k\% de los datos son menores que } P_k")
 
-    st.subheader("Traducción a Python")
-    st.code("""
-total = np.sum(x)
-producto = np.prod(x)
-pesos = np.array([w1, w2, ..., wn])
-media_ponderada = np.average(x, weights=pesos)
-desv_ponderada = np.sqrt(np.average((x - media_ponderada)**2, weights=pesos))
-p25 = np.percentile(x, 25)
-p50 = np.percentile(x, 50)  # mediana
-p75 = np.percentile(x, 75)
-""", language="python")
+    operaciones = [
+        (r"S = \sum_{i=1}^{n} x_i", "total = np.sum(x)"),
+        (r"P = \prod_{i=1}^{n} x_i", "producto = np.prod(x)"),
+        (r"\bar{x}_w = \frac{\sum_{i=1}^{n} w_i x_i}{\sum_{i=1}^{n} w_i}", "media_ponderada = np.average(x, weights=pesos)"),
+        (r"s_w = \sqrt{ \frac{\sum_{i=1}^{n} w_i (x_i - \bar{x}_w)^2}{\sum_{i=1}^{n} w_i} }", "desv_ponderada = np.sqrt(np.average((x - media_ponderada)**2, weights=pesos))"),
+        (r"P_k \text{ tal que k\% de los datos son menores que } P_k", "p25 = np.percentile(x, 25)\np50 = np.percentile(x, 50)\np75 = np.percentile(x, 75)")
+    ]
 
+    # Encabezado de la tabla
+    col1, col2 = st.columns([1, 1])
+    with col1:
+        st.markdown("**Operación (LaTeX)**")
+    with col2:
+        st.markdown("**Python**")
+    st.write("---")
+
+    for latex_expr, python_expr in operaciones:
+        col1, col2 = st.columns([1, 1])
+        with col1:
+            st.latex(latex_expr)
+        with col2:
+            st.markdown(f"`{python_expr}`")
+        st.write("")
+
+    # -------------------------------
+    # 4. Regresión Lineal Simple
+    # -------------------------------
     st.header("4. Regresión Lineal Simple")
-    st.write("Para datos $(x_i, y_i)$, la regresión lineal $y = m x + b$:")
+    st.write("Para datos $(x_i, y_i)$, la regresión lineal $y = m x + b$:")    
     st.latex(r"m = \frac{ \sum_i (x_i - \bar{x})(y_i - \bar{y}) }{ \sum_i (x_i - \bar{x})^2 }")
     st.latex(r"b = \bar{y} - m \bar{x}")
     st.latex(r"r = \frac{ \sum_i (x_i - \bar{x})(y_i - \bar{y}) }{ \sqrt{ \sum_i (x_i - \bar{x})^2 \sum_i (y_i - \bar{y})^2 } }")
@@ -880,8 +910,12 @@ sd_slope = see / np.sqrt(np.sum((x - np.mean(x))**2))
 sd_intercept = see * np.sqrt(np.sum(x**2)/(len(x) * np.sum((x - np.mean(x))**2)))
 """, language="python")
 
+    # -------------------------------
+    # 5. Incertidumbres Combinadas
+    # -------------------------------
     st.header("5. Incertidumbres Combinadas")
     st.latex(r"u_c = \sqrt{ \sum_{i=1}^{n} \left( \frac{\partial f}{\partial x_i} \cdot u_{x_i} \right)^2 }")
+
     st.subheader("Traducción a Python")
     st.code("""
 import sympy as sp
