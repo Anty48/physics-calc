@@ -548,19 +548,26 @@ with tab2:
             st.error(f"Error al calcular: {e}")
             st.write("Verifica que la función esté correctamente escrita y que uses los símbolos definidos.")
 with tab3:
-    st.header("Gráficas automáticas con incertidumbres")
-
-    st.write("Puedes introducir tus datos manualmente o subir un CSV con tus mediciones. También puedes superponer varias gráficas para comparar.")
+    st.header("Gráficas automáticas con incertidumbres y funciones")
+    st.write("Puedes introducir datos manuales, subir CSV o superponer funciones explícitas para comparar.")
 
     import numpy as np
     import matplotlib.pyplot as plt
     import pandas as pd
 
-    modo = st.radio("Modo de entrada de datos:", ["Manual", "CSV"])
+    modo = st.radio("Modo de entrada de datos:", ["Manual", "CSV", "Función"])
 
-    # --- MODO MANUAL ---
+    # Inicializar lista de gráficas si no existe
+    if "graficas" not in st.session_state:
+        st.session_state.graficas = []
+
+    colores = plt.cm.tab10.colors
+
+    superponer = st.checkbox("Superponer nuevas gráficas a las anteriores", value=False)
+
     if modo == "Manual":
         n_puntos = st.number_input("Número de puntos", min_value=2, value=4, step=1)
+        graf_label = st.text_input("Nombre de la gráfica", value="Manual", key="manual_label")
 
         datos = []
         for i in range(int(n_puntos)):
@@ -575,22 +582,21 @@ with tab3:
                 dy = st.number_input(f"Δy{i+1}", value=0.1, key=f"dy{i}")
             datos.append((x, dx, y, dy))
 
-        if st.button("Generar gráfica manual"):
+        if st.button("Añadir gráfica manual"):
+            if not superponer:
+                st.session_state.graficas = []
+
             xs = np.array([d[0] for d in datos])
             dxs = np.array([d[1] for d in datos])
             ys = np.array([d[2] for d in datos])
             dys = np.array([d[3] for d in datos])
 
-            fig, ax = plt.subplots()
-            ax.errorbar(xs, ys, xerr=dxs, yerr=dys, fmt='o-', capsize=4,
-                        ecolor='black', color='tab:blue', label='Datos experimentales')
-            ax.set_xlabel("X")
-            ax.set_ylabel("Y")
-            ax.set_title("Gráfico con barras de error")
-            ax.legend()
-            ax.grid(True)
-            st.pyplot(fig)
-            st.info("La línea une los puntos medidos y los palitos representan las incertidumbres.")
+            st.session_state.graficas.append({
+                "xs": xs, "dxs": dxs, "ys": ys, "dys": dys,
+                "color": colores[len(st.session_state.graficas) % len(colores)],
+                "label": graf_label
+            })
+            st.success(f"Gráfica '{graf_label}' añadida ✅")
 
     elif modo == "CSV":
         uploaded_file = st.file_uploader("Cargar CSV", type=["csv"])
@@ -600,22 +606,11 @@ with tab3:
             st.dataframe(df.head())
 
             n_graficas = st.number_input("Número de gráficas a superponer", min_value=1, value=1, step=1)
-
-            # Barra para seleccionar cuántos puntos usar
             n_puntos = st.slider("Número de puntos a usar por gráfica", min_value=2, max_value=len(df), value=min(10, len(df)))
-
-            # Inicializar la lista de gráficas si no existe
-            if "graficas" not in st.session_state:
-                st.session_state.graficas = []
-
-            colores = plt.cm.tab10.colors
 
             for i in range(int(n_graficas)):
                 st.subheader(f"Gráfica {i+1}")
-
-                # Barra para poner nombre a la gráfica
-                graf_label = st.text_input(f"Nombre de la gráfica {i+1}", value=f"Gráfica {i+1}", key=f"label_{i}")
-
+                graf_label = st.text_input(f"Nombre de la gráfica {i+1}", value=f"CSV {i+1}", key=f"csv_label_{i}")
                 col1, col2, col3, col4 = st.columns(4)
                 with col1:
                     x_col = st.selectbox(f"X (Gráfica {i+1})", df.columns, key=f"x_col_{i}")
@@ -626,38 +621,63 @@ with tab3:
                 with col4:
                     dy_col = st.selectbox(f"ΔY (Gráfica {i+1})", [None] + list(df.columns), key=f"dy_col_{i}")
 
-                if st.button(f"Añadir gráfica {i+1}"):
+                if st.button(f"Añadir gráfica CSV {i+1}"):
+                    if not superponer:
+                        st.session_state.graficas = []
+
                     xs = df[x_col].values[:n_puntos]
                     dxs = df[dx_col].values[:n_puntos] if dx_col is not None else np.zeros(n_puntos)
                     ys = df[y_col].values[:n_puntos]
                     dys = df[dy_col].values[:n_puntos] if dy_col is not None else np.zeros(n_puntos)
 
                     st.session_state.graficas.append({
-                        "xs": xs,
-                        "dxs": dxs,
-                        "ys": ys,
-                        "dys": dys,
-                        "color": colores[i % len(colores)],
-                        "label": graf_label  # usamos el nombre introducido
+                        "xs": xs, "dxs": dxs, "ys": ys, "dys": dys,
+                        "color": colores[len(st.session_state.graficas) % len(colores)],
+                        "label": graf_label
                     })
-                    st.success(f"Gráfica '{graf_label}' añadida correctamente ✅")
+                    st.success(f"Gráfica '{graf_label}' añadida ✅")
 
+    elif modo == "Función":
+        graf_label = st.text_input("Nombre de la función", value="Función", key="func_label")
+        func_str = st.text_input("Escribe la función y=f(x)", value="x**2 + 2*x")
+        x_min = st.number_input("x mínimo", value=0.0)
+        x_max = st.number_input("x máximo", value=10.0)
+        n_puntos = st.slider("Número de puntos a graficar", 10, 1000, 100)
 
-            if st.button("Mostrar todas las gráficas"):
-                if len(st.session_state.graficas) == 0:
-                    st.warning("Primero añade al menos una gráfica.")
-                else:
-                    fig, ax = plt.subplots()
-                    for g in st.session_state.graficas:
-                        ax.errorbar(
-                            g["xs"], g["ys"], xerr=g["dxs"], yerr=g["dys"],
-                            fmt='o-', capsize=4, ecolor='black',
-                            color=g["color"], label=g["label"]
-                        )
-                    ax.set_xlabel("X")
-                    ax.set_ylabel("Y")
-                    ax.set_title("Gráfico con múltiples conjuntos de datos")
-                    ax.legend()
-                    ax.grid(True)
-                    st.pyplot(fig)
-                    st.info("Cada color representa un conjunto de datos distinto con sus incertidumbres.")
+        if st.button("Añadir función"):
+            if not superponer:
+                st.session_state.graficas = []
+
+            x_vals = np.linspace(x_min, x_max, n_puntos)
+            try:
+                y_vals = np.array([eval(func_str, {"x": xv, "np": np}) for xv in x_vals])
+                st.session_state.graficas.append({
+                    "xs": x_vals, "dxs": np.zeros_like(x_vals),
+                    "ys": y_vals, "dys": np.zeros_like(y_vals),
+                    "color": colores[len(st.session_state.graficas) % len(colores)],
+                    "label": graf_label
+                })
+                st.success(f"Función '{graf_label}' añadida ✅")
+            except Exception as e:
+                st.error(f"Error al evaluar la función: {e}")
+
+    # Botón para mostrar todas las gráficas acumuladas
+    if st.button("Mostrar todas las gráficas"):
+        if len(st.session_state.graficas) == 0:
+            st.warning("Primero añade al menos una gráfica.")
+        else:
+            fig, ax = plt.subplots()
+            titulos = []
+            for g in st.session_state.graficas:
+                ax.errorbar(g["xs"], g["ys"], xerr=g["dxs"], yerr=g["dys"],
+                            fmt='o-' if np.any(g["dxs"]+g["dys"]) else '-', capsize=4,
+                            ecolor='black', color=g["color"], label=g["label"])
+                titulos.append(g["label"])
+            ax.set_xlabel("X")
+            ax.set_ylabel("Y")
+            ax.set_title(" + ".join(titulos))
+            ax.legend()
+            ax.grid(True)
+            st.pyplot(fig)
+            st.info("Cada color representa un conjunto de datos o función distinto con sus incertidumbres.")
+
