@@ -66,7 +66,7 @@ with tab1:
     with col1:
         num_variables = st.number_input("Número de variables a analizar", min_value=1, max_value=5, value=2, step=1)
     with col2:
-        num_mediciones = st.number_input("Número de mediciones por variable", min_value=5, max_value=50, value=5, step=1)
+        num_mediciones = st.number_input("Número de mediciones por variable", min_value=2, max_value=50, value=5, step=1)
 
     # Sección para ingresar datos
     st.header("Ingreso de Datos")
