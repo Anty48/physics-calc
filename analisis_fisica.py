@@ -761,22 +761,11 @@ with tab5:
 
     # Fórmulas en LaTeX
     formulas = r"""
-    \frac{\partial f}{\partial x_1}, \frac{\partial f}{\partial x_2}, \dots \\
-    u_c = \sqrt{ \left( \frac{\partial f}{\partial x_1} u_{x_1} \right)^2 + \left( \frac{\partial f}{\partial x_2} u_{x_2} \right)^2 + \dots } \\
-    u_{rel} = \frac{u_c}{|f|} \\
-    \text{Media: } \bar{x}, \quad \text{Desviación típica: } \sigma
+    \frac{\partial f}{\partial x_1},\ \frac{\partial f}{\partial x_2},\ \dots \\[2mm]
+    u_c = \sqrt{ \left( \frac{\partial f}{\partial x_1} u_{x_1} \right)^2 + \left( \frac{\partial f}{\partial x_2} u_{x_2} \right)^2 + \dots } \\[1mm]
+    u_{rel} = \frac{u_c}{|f|} \\[1mm]
+    \bar{x}, \quad \sigma
     """
 
-    # Recuadro blanco decorativo con st.markdown
-    st.markdown(
-        """
-    <div style="background-color:white; padding:20px; border-radius:10px; box-shadow: 2px 2px 8px #ccc;">
-    """,
-        unsafe_allow_html=True
-    )
-
-    # Mostrar fórmulas LaTeX dentro
+    # Mostrar todas las fórmulas juntas
     st.latex(formulas)
-
-    # Cerrar el div
-    st.markdown("</div>", unsafe_allow_html=True)
