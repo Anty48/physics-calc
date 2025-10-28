@@ -758,7 +758,7 @@ with tab5:
         with col2:
             st.markdown(f"`{python_expr}`")
         st.write("")
-
+    st.title("Fórmulas de incertidumbre:")
     # Fórmulas en LaTeX
     formulas = r"""
     \begin{align*}
