@@ -759,13 +759,26 @@ with tab5:
             st.markdown(f"`{python_expr}`")
         st.write("")
 
-    # Fórmulas en LaTeX
-    formulas = r"""
-    \frac{\partial f}{\partial x_1},\ \frac{\partial f}{\partial x_2},\ \dots \\[2mm]
-    u_c = \sqrt{ \left( \frac{\partial f}{\partial x_1} u_{x_1} \right)^2 + \left( \frac{\partial f}{\partial x_2} u_{x_2} \right)^2 + \dots } \\[1mm]
-    u_{rel} = \frac{u_c}{|f|} \\[1mm]
-    \bar{x}, \quad \sigma
-    """
+# Supongamos que estas son tus variables y derivadas simbólicas
+variables = ['x', 'y', 'z']  # ejemplo
+derivatives = {var: sp.symbols(f'df_d{var}') for var in variables}
 
-    # Mostrar todas las fórmulas juntas
-    st.latex(formulas)
+# Construir las líneas de derivadas parciales en LaTeX
+partials = " \\\\ ".join([r"\frac{\partial f}{\partial %s} = %s" % (var, sp.latex(derivatives[var])) 
+                          for var in variables])
+
+# Fórmula de incertidumbre combinada
+terms = " + ".join([f"({sp.latex(derivatives[var])} \cdot u_{{{var}}})^2" for var in variables])
+combined_unc = r"u_c = \sqrt{" + terms + "}"
+
+# Incertidumbre relativa
+rel_unc = r"u_{rel} = \frac{u_c}{|f|}"
+
+# Estadísticas
+stats = r"\bar{x}, \quad \sigma"
+
+# Unir todo con separación clara
+all_formulas = partials + r" \\[5mm] " + combined_unc + r" \\[5mm] " + rel_unc + r" \\[5mm] " + stats
+
+# Mostrar en st.latex
+st.latex(all_formulas)
