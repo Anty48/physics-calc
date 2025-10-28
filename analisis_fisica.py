@@ -417,6 +417,12 @@ if calcular_clicked and function_str:
             derivatives[var] = deriv
             st.latex(r"\frac{\partial f}{\partial " + var + "} = " + sp.latex(deriv))
 
+        # Fórmula completa de la incertidumbre combinada
+        terms = [derivatives[var]*symbols[var+"_u"] if False else f"({sp.latex(derivatives[var])} \cdot u_{{{var}}})^2" for var in variables_info]
+        combined_formula_latex = r"u_c = \sqrt{" + " + ".join(terms) + "}"
+        st.write("### Fórmula completa de la incertidumbre combinada:")
+        st.latex(combined_formula_latex)
+
         # Diccionario de valores para sustitución
         values_dict = {**{v: variables_info[v]["valor"] for v in variables_info},
                        **{c: constantes_info[c]["valor"] for c in constantes_info}}
