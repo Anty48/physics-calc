@@ -458,7 +458,7 @@ if calcular_clicked and function_str:
         if len(variables_info) > 1:
             fig, ax = plt.subplots(figsize=(10,5))
             vars_list = [c["Variable"] for c in contributions]
-            perc_list = [float(c["Contribución (%)"]) for c in contributions]
+            perc_list = [float(c["Contribución (%)"].strip('%')) for c in contributions]
             ax.bar(vars_list, perc_list, color=plt.cm.viridis(np.linspace(0,0.8,len(vars_list))))
             for i, val in enumerate(perc_list):
                 ax.text(i, val, f"{val:.2f}%", ha='center', va='bottom')
