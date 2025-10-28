@@ -761,20 +761,20 @@ with tab5:
 
     # Fórmulas en LaTeX
     formulas = r"""
-    \begin{align}
-    \text{Incertesa absoluta:} \quad & u_x = \Delta x [0.2cm] \\
-    \text{Incertesa relativa:} \quad & \varepsilon_x = \frac{u_x}{x} [0.2cm] \\
-    \text{Combinació d'incerteses (suma/resta):} \quad & u_R = \sqrt{u_A^2 + u_B^2} [0.2cm] \\
-    \text{Combinació d'incerteses (producte/cocient):} \quad & \frac{u_R}{R} = \sqrt{\left(\frac{u_A}{A}\right)^2 + \left(\frac{u_B}{B}\right)^2} [0.2cm] \\
-    \text{Incertesa d'una potència:} \quad & \frac{u_R}{R} = |n| \frac{u_A}{A} [0.2cm] \\
-    \text{Mitjana aritmètica:} \quad & \bar{x} = \frac{1}{N}\sum_{i=1}^{N} x_i [0.2cm] \\
-    \text{Desviació típica:} \quad & s = \sqrt{\frac{1}{N-1} \sum_{i=1}^{N} (x_i - \bar{x})^2} [0.2cm] \\
-    \text{Incertesa de la mitjana:} \quad & u_{\bar{x}} = \frac{s}{\sqrt{N}} [0.2cm] \\
-    \text{Propagació general d'incerteses:} \quad & u_f = \sqrt{\left(\frac{\partial f}{\partial x_1} u_{x_1}\right)^2 + \dots + \left(\frac{\partial f}{\partial x_n} u_{x_n}\right)^2} [0.2cm] \\
-    \text{Variança:} \quad & \sigma^2 = \frac{1}{N} \sum_{i=1}^{N} (x_i - \mu)^2 [0.2cm] \\
-    \text{Desviació típica poblacional:} \quad & \sigma = \sqrt{\sigma^2} [0.2cm] \\
+    \begin{align*}
+    \text{Incertesa absoluta:} \quad & u_x = \Delta x \\[0.2cm]
+    \text{Incertesa relativa:} \quad & \varepsilon_x = \frac{u_x}{x} \\[0.2cm]
+    \text{Combinació d'incerteses (suma/resta):} \quad & u_R = \sqrt{u_A^2 + u_B^2} \\[0.2cm]
+    \text{Combinació d'incerteses (producte/cocient):} \quad & \frac{u_R}{R} = \sqrt{\left(\frac{u_A}{A}\right)^2 + \left(\frac{u_B}{B}\right)^2} \\[0.2cm]
+    \text{Incertesa d'una potència:} \quad & \frac{u_R}{R} = |n| \frac{u_A}{A} \\[0.2cm]
+    \text{Mitjana aritmètica:} \quad & \bar{x} = \frac{1}{N}\sum_{i=1}^{N} x_i \\[0.2cm]
+    \text{Desviació típica:} \quad & s = \sqrt{\frac{1}{N-1} \sum_{i=1}^{N} (x_i - \bar{x})^2} \\[0.2cm]
+    \text{Incertesa de la mitjana:} \quad & u_{\bar{x}} = \frac{s}{\sqrt{N}} \\[0.2cm]
+    \text{Propagació general d'incerteses:} \quad & u_f = \sqrt{\left(\frac{\partial f}{\partial x_1} u_{x_1}\right)^2 + \dots + \left(\frac{\partial f}{\partial x_n} u_{x_n}\right)^2} \\[0.2cm]
+    \text{Variança:} \quad & \sigma^2 = \frac{1}{N} \sum_{i=1}^{N} (x_i - \mu)^2 \\[0.2cm]
+    \text{Desviació típica poblacional:} \quad & \sigma = \sqrt{\sigma^2} \\[0.2cm]
     \text{Error estàndard de la mitjana:} \quad & \sigma_{\bar{x}} = \frac{\sigma}{\sqrt{N}}
-    \end{align}
+    \end{align*}
         """
 
     # Mostrar todas las fórmulas juntas
