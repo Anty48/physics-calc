@@ -759,37 +759,24 @@ with tab5:
             st.markdown(f"`{python_expr}`")
         st.write("")
 
-    # Ejemplo: supongamos que ya tienes estas variables:
-    # variables_info, derivatives, func_expr
+    import streamlit as st
 
-    #    Crear fórmulas LaTeX
-    partials_latex = " \\\\ ".join([r"\frac{\partial f}{\partial %s} = %s" % (var, sp.latex(derivatives[var]))
-                                   for var in variables_info])
-
-    terms_latex = " + ".join([f"({sp.latex(derivatives[var])} \cdot u_{{{var}}})^2" for var in variables_info])
-    combined_unc_latex = r"u_c = \sqrt{" + terms_latex + "}"
-
-    rel_unc_latex = r"u_{rel} = \frac{u_c}{|f|}"
-
-    # Estadísticas de ejemplo
-    x_vals = [variables_info[var]["valor"] for var in variables_info]
-    mean_val = np.mean(x_vals)
-    std_val = np.std(x_vals, ddof=1) if len(x_vals) > 1 else 0
-    stats_latex = r"\text{Media: } %.3f, \quad \text{Desviación típica: } %.3f" % (mean_val, std_val)
-
-        # Combinar todo en un solo bloque
-    all_formulas = f"""
-    {partials_latex} \\\\
-    {combined_unc_latex} \\\\
-    {rel_unc_latex} \\\\
-    {stats_latex}
+    # Tu bloque de fórmulas en LaTeX
+    formulas = r"""
+    \frac{\partial f}{\partial x_1}, \frac{\partial f}{\partial x_2}, \dots
+    \\[2mm]
+    u_c = \sqrt{ \left( \frac{\partial f}{\partial x_1} u_{x_1} \right)^2 + \left( \frac{\partial f}{\partial x_2} u_{x_2} \right)^2 + \dots }
+    \\[1mm]
+    u_{rel} = \frac{u_c}{|f|}
+    \\[1mm]
+    \text{Media: } \bar{x}, \quad \text{Desviación típica: } \sigma
     """
 
-    # Mostrar en recuadro blanco
+    # Mostrarlo en un recuadro blanco
     st.markdown(
         f"""
     <div style="background-color:white; padding:15px; border-radius:10px; box-shadow: 1px 1px 5px #ddd;">
-        $$ {all_formulas} $$
+        $$ {formulas} $$
     </div>
     """,
         unsafe_allow_html=True
