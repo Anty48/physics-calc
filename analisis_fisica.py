@@ -326,235 +326,151 @@ with tab1:
 # Contenido de la segunda pestaña: Calculadora de Incertidumbres Combinadas
 with tab2:
     st.header("Calculadora de Incertidumbres Combinadas")
-    
-    st.write("""
-    Esta sección te permite calcular el valor de una función y su incertidumbre combinada 
-    a partir de los valores e incertidumbres de sus variables. La calculadora utiliza 
-    la fórmula de propagación de incertidumbres:
-    """)
-    
-    st.latex(r"u_c = \sqrt{\sum_{i=1}^{n} \left(\frac{\partial f}{\partial x_i} \cdot u_{x_i}\right)^2}")
-    
-    # Configuración inicial de la calculadora
-    col1, col2 = st.columns(2)
-    with col1:
-        num_variables = st.number_input("Número de variables", min_value=1, max_value=10, value=2, step=1, key="ic_num_vars")
-    with col2:
-        num_constantes = st.number_input("Número de constantes", min_value=0, max_value=10, value=1, step=1, key="ic_num_const")
-    
-    # Contenedores para almacenar información
-    variables_info = {}
-    constantes_info = {}
-    
-    # Input para variables
-    st.subheader("Variables")
-    
-    # Crear dos columnas para organizar mejor los inputs
-    cols = st.columns(2)
-    
-    for i in range(num_variables):
-        col_idx = i % 2  # Alternar entre columnas 0 y 1
-        with cols[col_idx]:
-            st.write(f"#### Variable {i+1}")
-            var_symbol = st.text_input(f"Símbolo de la variable {i+1}", value=chr(120+i), key=f"var_symbol_{i}")  # Comienza con 'x', luego 'y', 'z', etc.
-            var_value = st.number_input(f"Valor de {var_symbol}", value=1.0, format=f"%.{st.session_state.precision}f", key=f"var_value_{i}")
-            var_uncertainty = st.number_input(f"Incertidumbre de {var_symbol}", value=0.1, min_value=0.0, format=f"%.{st.session_state.precision}f", key=f"var_uncert_{i}")
-            
-            variables_info[var_symbol] = {
-                "valor": var_value,
-                "incertidumbre": var_uncertainty
-            }
-    
-    # Input para constantes (si hay alguna)
-    if num_constantes > 0:
-        st.subheader("Constantes")
-        
-        cols = st.columns(2)
-        
-        for i in range(num_constantes):
-            col_idx = i % 2  # Alternar entre columnas 0 y 1
-            with cols[col_idx]:
-                st.write(f"#### Constante {i+1}")
-                const_symbol = st.text_input(f"Símbolo de la constante {i+1}", value=chr(97+i), key=f"const_symbol_{i}")  # Comienza con 'a', luego 'b', 'c', etc.
-                const_value = st.number_input(f"Valor de {const_symbol}", value=2.0, format=f"%.{st.session_state.precision}f", key=f"const_value_{i}")
-                
-                constantes_info[const_symbol] = {
-                    "valor": const_value
-                }
-    
-    # Input para la función
-    st.subheader("Función")
-    
-    # Crear una guía para el usuario sobre cómo escribir la función
-    st.write("""
-    Ingresa la función utilizando los símbolos definidos anteriormente. Usa operadores Python estándar:
-    - Suma: +
-    - Resta: -
-    - Multiplicación: *
-    - División: /
-    - Potencia: **
-    - Funciones disponibles: sin, cos, tan, exp, log, sqrt
-    
-    Ejemplos: `x**2 + y`, `sin(x) + y/z`, `sqrt(x**2 + y**2)`
-    """)
-    
-    # Mostrar los símbolos disponibles para ayudar al usuario
-    available_symbols = ", ".join(list(variables_info.keys()) + list(constantes_info.keys()))
-    st.write(f"Símbolos disponibles: {available_symbols}")
-    
-    # Input para la función
-    function_str = st.text_input("Función f(variables, constantes)", value="x**2 + a*y", key="function_input")
-    st.subheader("Opción avanzada: escribir función en LaTeX")
-    latex_str = st.text_area(
-        "Función en LaTeX (ej: x^2 + a y, sin(x), \\pi*x)", 
-        value="", 
-        help="Si tu función es complicada o usa constantes especiales como \\pi, escribe aquí."
-    )
 
-    # Botón para calcular
-    calcular_clicked = st.button("Calcular valor e incertidumbre")
-    
-    if calcular_clicked and function_str:
-        try:
-            # Crear símbolos sympy para cada variable
-            symbols = {}
-            for var in variables_info:
-                symbols[var] = sp.symbols(var)
-            for const in constantes_info:
-                symbols[const] = sp.symbols(const)
-            
-            # Convertir la cadena de función a una expresión sympy
-            if latex_str:
-                try:
-                    func_expr = parse_latex(latex_str)
-                    st.write("Expresión convertida desde LaTeX:")
-                    st.latex(sp.latex(func_expr))
-                except Exception as e:
-                    st.error(f"No se pudo convertir LaTeX a función: {e}")
-                    func_expr = sp.sympify(function_str)  # fallback a Python
-            else:
+st.write("""
+Esta sección te permite calcular el valor de una función y su incertidumbre combinada 
+a partir de los valores e incertidumbres de sus variables. La calculadora utiliza 
+la fórmula de propagación de incertidumbres:
+""")
+
+st.latex(r"u_c = \sqrt{\sum_{i=1}^{n} \left(\frac{\partial f}{\partial x_i} \cdot u_{x_i}\right)^2}")
+
+# Configuración inicial
+col1, col2 = st.columns(2)
+with col1:
+    num_variables = st.number_input("Número de variables", min_value=1, max_value=10, value=2, step=1, key="ic_num_vars")
+with col2:
+    num_constantes = st.number_input("Número de constantes", min_value=0, max_value=10, value=1, step=1, key="ic_num_const")
+
+variables_info = {}
+constantes_info = {}
+
+# Input para variables
+st.subheader("Variables")
+cols = st.columns(2)
+for i in range(num_variables):
+    col_idx = i % 2
+    with cols[col_idx]:
+        st.write(f"#### Variable {i+1}")
+        var_symbol = st.text_input(f"Símbolo de la variable {i+1}", value=chr(120+i), key=f"var_symbol_{i}")
+        var_value = st.number_input(f"Valor de {var_symbol}", value=1.0, format=f"%.{st.session_state.precision}f", key=f"var_value_{i}")
+        var_uncertainty = st.number_input(f"Incertidumbre de {var_symbol}", value=0.1, min_value=0.0, format=f"%.{st.session_state.precision}f", key=f"var_uncert_{i}")
+        variables_info[var_symbol] = {"valor": var_value, "incertidumbre": var_uncertainty}
+
+# Input para constantes
+if num_constantes > 0:
+    st.subheader("Constantes")
+    cols = st.columns(2)
+    for i in range(num_constantes):
+        col_idx = i % 2
+        with cols[col_idx]:
+            st.write(f"#### Constante {i+1}")
+            const_symbol = st.text_input(f"Símbolo de la constante {i+1}", value=chr(97+i), key=f"const_symbol_{i}")
+            const_value = st.number_input(f"Valor de {const_symbol}", value=2.0, format=f"%.{st.session_state.precision}f", key=f"const_value_{i}")
+            constantes_info[const_symbol] = {"valor": const_value}
+
+# Input para función
+st.subheader("Función")
+st.write("""
+Ingresa la función utilizando los símbolos definidos anteriormente. Usa operadores Python estándar:
+- Suma: +
+- Resta: -
+- Multiplicación: *
+- División: /
+- Potencia: **
+- Funciones disponibles: sin, cos, tan, exp, log, sqrt
+
+Ejemplos: `x**2 + y`, `sin(x) + y/z`, `sqrt(x**2 + y**2)`
+""")
+
+available_symbols = ", ".join(list(variables_info.keys()) + list(constantes_info.keys()))
+st.write(f"Símbolos disponibles: {available_symbols}")
+
+function_str = st.text_input("Función f(variables, constantes)", value="x**2 + a*y", key="function_input")
+latex_str = st.text_area("Función en LaTeX (opcional)", value="", help="Si tu función usa constantes especiales como \\pi")
+
+calcular_clicked = st.button("Calcular valor e incertidumbre")
+
+if calcular_clicked and function_str:
+    try:
+        # Crear símbolos sympy
+        symbols = {**{v: sp.symbols(v) for v in variables_info}, **{c: sp.symbols(c) for c in constantes_info}}
+
+        # Parsear función
+        if latex_str:
+            try:
+                func_expr = parse_latex(latex_str)
+            except Exception as e:
+                st.error(f"No se pudo convertir LaTeX: {e}")
                 func_expr = sp.sympify(function_str)
-            
-            # Mostrar la expresión en formato LaTeX
-            st.write("### Función a evaluar:")
-            st.latex(sp.latex(func_expr))
-            
-            # Calcular derivadas parciales para cada variable (no constantes)
-            st.write("### Derivadas parciales:")
-            derivatives = {}
-            
-            for var_symbol in variables_info:
-                derivative = sp.diff(func_expr, symbols[var_symbol])
-                derivatives[var_symbol] = derivative
-                st.write(f"Derivada parcial respecto a {var_symbol}:")
-                st.latex(r"\frac{\partial f}{\partial " + var_symbol + "} = " + sp.latex(derivative))
-            
-            # Crear un diccionario de valores para evaluación
-            values_dict = {}
-            for var in variables_info:
-                values_dict[var] = variables_info[var]["valor"]
-            for const in constantes_info:
-                values_dict[const] = constantes_info[const]["valor"]
-            
-            # Evaluar la función con los valores dados
-            func_value = float(func_expr.evalf(subs=values_dict))
-            
-            # Evaluar las derivadas parciales
-            derivative_values = {}
-            for var_symbol, derivative in derivatives.items():
-                derivative_values[var_symbol] = float(derivative.evalf(subs=values_dict))
-            
-            # Calcular la incertidumbre combinada
-            squared_terms = []
-            for var_symbol in variables_info:
-                derivative_value = derivative_values[var_symbol]
-                uncertainty = variables_info[var_symbol]["incertidumbre"]
-                term = (derivative_value * uncertainty)**2
-                squared_terms.append(term)
-            
-            combined_uncertainty = np.sqrt(np.sum(squared_terms))
-            
-            # Mostrar resultados en forma de tabla
-            results_data = []
-            
-            # Primero añadir el valor de la función
-            results_data.append({
-                "Descripción": "Valor de la función",
-                "Valor": f"{func_value:.{st.session_state.precision}f}"
+        else:
+            func_expr = sp.sympify(function_str)
+
+        st.write("### Función a evaluar:")
+        st.latex(sp.latex(func_expr))
+
+        # Derivadas parciales
+        st.write("### Derivadas parciales:")
+        derivatives = {}
+        for var in variables_info:
+            deriv = sp.diff(func_expr, symbols[var])
+            derivatives[var] = deriv
+            st.latex(r"\frac{\partial f}{\partial " + var + "} = " + sp.latex(deriv))
+
+        # Diccionario de valores para sustitución
+        values_dict = {**{v: variables_info[v]["valor"] for v in variables_info},
+                       **{c: constantes_info[c]["valor"] for c in constantes_info}}
+
+        # Evaluar función y derivadas con valores numéricos
+        func_value = float(func_expr.evalf(subs=values_dict))
+        derivative_values = {var: float(deriv.evalf(subs=values_dict)) for var, deriv in derivatives.items()}
+
+        # Incertidumbre combinada
+        squared_terms = [(derivative_values[var]*variables_info[var]["incertidumbre"])**2 for var in variables_info]
+        combined_uncertainty = np.sqrt(np.sum(squared_terms))
+
+        # Mostrar resultados
+        results_data = [
+            {"Descripción": "Valor de la función", "Valor": f"{func_value:.{st.session_state.precision}f}"},
+            {"Descripción": "Incertidumbre combinada", "Valor": f"{combined_uncertainty:.{st.session_state.precision}f}"},
+            {"Descripción": "Resultado final", "Valor": f"{func_value:.{st.session_state.precision}f} ± {combined_uncertainty:.{st.session_state.precision}f}"}
+        ]
+        if func_value != 0:
+            rel_unc = (combined_uncertainty/abs(func_value))*100
+            results_data.append({"Descripción": "Incertidumbre relativa", "Valor": f"{rel_unc:.{st.session_state.precision}f}%"})
+        st.table(pd.DataFrame(results_data))
+
+        # Contribuciones individuales
+        contributions = []
+        for var in variables_info:
+            term = (derivative_values[var]*variables_info[var]["incertidumbre"])**2
+            percent = (term/np.sum(squared_terms))*100
+            contributions.append({
+                "Variable": var,
+                "Derivada parcial": f"{derivative_values[var]:.{st.session_state.precision}f}",
+                "Incertidumbre": f"{variables_info[var]['incertidumbre']:.{st.session_state.precision}f}",
+                "Término (∂f/∂x·u)²": f"{term:.{st.session_state.precision}f}",
+                "Contribución (%)": f"{percent:.2f}%"
             })
-            
-            # Añadir la incertidumbre combinada
-            results_data.append({
-                "Descripción": "Incertidumbre combinada",
-                "Valor": f"{combined_uncertainty:.{st.session_state.precision}f}"
-            })
-            
-            # Añadir el resultado final con incertidumbre
-            results_data.append({
-                "Descripción": "Resultado final",
-                "Valor": f"{func_value:.{st.session_state.precision}f} ± {combined_uncertainty:.{st.session_state.precision}f}"
-            })
-            
-            # Añadir la incertidumbre relativa en porcentaje
-            if func_value != 0:
-                rel_uncertainty = (combined_uncertainty / abs(func_value)) * 100
-                results_data.append({
-                    "Descripción": "Incertidumbre relativa",
-                    "Valor": f"{rel_uncertainty:.{st.session_state.precision}f}%"
-                })
-            
-            # Mostrar la tabla de resultados
-            results_df = pd.DataFrame(results_data)
-            st.write("### Resultados:")
-            st.table(results_df)
-            
-            # Mostrar los términos individuales que contribuyen a la incertidumbre
-            st.write("### Contribuciones a la incertidumbre:")
-            contributions = []
-            
-            for var_symbol in variables_info:
-                derivative_value = derivative_values[var_symbol]
-                uncertainty = variables_info[var_symbol]["incertidumbre"]
-                term = (derivative_value * uncertainty)**2
-                percent_contribution = (term / np.sum(squared_terms)) * 100
-                
-                contributions.append({
-                    "Variable": var_symbol,
-                    "Derivada parcial": f"{derivative_value:.{st.session_state.precision}f}",
-                    "Incertidumbre": f"{uncertainty:.{st.session_state.precision}f}",
-                    "Término (∂f/∂x·u)²": f"{term:.{st.session_state.precision}f}",
-                    "Contribución (%)": f"{percent_contribution:.2f}%"
-                })
-            
-            contrib_df = pd.DataFrame(contributions)
-            st.table(contrib_df)
-            
-            # Visualizar las contribuciones a la incertidumbre en un gráfico de barras
-            if len(variables_info) > 1:  # Solo mostrar el gráfico si hay más de una variable
-                st.write("### Visualización de contribuciones a la incertidumbre:")
-                
-                fig, ax = plt.subplots(figsize=(10, 5))
-                
-                variables = contrib_df["Variable"]
-                contributions_pct = [float(x.strip('%')) for x in contrib_df["Contribución (%)"].values]
-                
-                colors = plt.cm.viridis(np.linspace(0, 0.8, len(variables)))
-                bars = ax.bar(variables, contributions_pct, color=colors)
-                
-                # Añadir etiquetas
-                for bar in bars:
-                    height = bar.get_height()
-                    ax.text(bar.get_x() + bar.get_width() / 2, height,
-                            f'{height:.2f}%', ha='center', va='bottom')
-                
-                ax.set_xlabel('Variables')
-                ax.set_ylabel('Contribución a la incertidumbre total (%)')
-                ax.set_title('Contribución de cada variable a la incertidumbre combinada')                
-                st.pyplot(fig)
-            
-        except Exception as e:
-            st.error(f"Error al calcular: {e}")
-            st.write("Verifica que la función esté correctamente escrita y que uses los símbolos definidos.")
+        st.table(pd.DataFrame(contributions))
+
+        # Gráfico de contribuciones
+        if len(variables_info) > 1:
+            fig, ax = plt.subplots(figsize=(10,5))
+            vars_list = [c["Variable"] for c in contributions]
+            perc_list = [float(c["Contribución (%)"]) for c in contributions]
+            ax.bar(vars_list, perc_list, color=plt.cm.viridis(np.linspace(0,0.8,len(vars_list))))
+            for i, val in enumerate(perc_list):
+                ax.text(i, val, f"{val:.2f}%", ha='center', va='bottom')
+            ax.set_xlabel("Variables")
+            ax.set_ylabel("Contribución a la incertidumbre total (%)")
+            ax.set_title("Contribución de cada variable a la incertidumbre combinada")
+            st.pyplot(fig)
+
+    except Exception as e:
+        st.error(f"Error al calcular: {e}")
+        st.write("Verifica la función y los símbolos definidos.")
+
 with tab3:
     st.header("Gráficas automáticas con incertidumbres y funciones")
     st.write("Puedes introducir datos manualmente, subir un CSV o superponer funciones explícitas para comparar.")
