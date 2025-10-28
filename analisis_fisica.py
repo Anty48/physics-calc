@@ -759,25 +759,24 @@ with tab5:
             st.markdown(f"`{python_expr}`")
         st.write("")
 
-    import streamlit as st
-
-    # Tu bloque de fórmulas en LaTeX
+    # Fórmulas en LaTeX
     formulas = r"""
-    \frac{\partial f}{\partial x_1}, \frac{\partial f}{\partial x_2}, \dots
-    \\[2mm]
-    u_c = \sqrt{ \left( \frac{\partial f}{\partial x_1} u_{x_1} \right)^2 + \left( \frac{\partial f}{\partial x_2} u_{x_2} \right)^2 + \dots }
-    \\[1mm]
-    u_{rel} = \frac{u_c}{|f|}
-    \\[1mm]
+    \frac{\partial f}{\partial x_1}, \frac{\partial f}{\partial x_2}, \dots \\
+    u_c = \sqrt{ \left( \frac{\partial f}{\partial x_1} u_{x_1} \right)^2 + \left( \frac{\partial f}{\partial x_2} u_{x_2} \right)^2 + \dots } \\
+    u_{rel} = \frac{u_c}{|f|} \\
     \text{Media: } \bar{x}, \quad \text{Desviación típica: } \sigma
     """
 
-    # Mostrarlo en un recuadro blanco
+    # Recuadro blanco decorativo con st.markdown
     st.markdown(
-        f"""
-    <div style="background-color:white; padding:15px; border-radius:10px; box-shadow: 1px 1px 5px #ddd;">
-        $$ {formulas} $$
-    </div>
+        """
+    <div style="background-color:white; padding:20px; border-radius:10px; box-shadow: 2px 2px 8px #ccc;">
     """,
         unsafe_allow_html=True
     )
+
+    # Mostrar fórmulas LaTeX dentro
+    st.latex(formulas)
+
+    # Cerrar el div
+    st.markdown("</div>", unsafe_allow_html=True)
