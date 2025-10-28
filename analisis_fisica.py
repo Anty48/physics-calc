@@ -759,26 +759,23 @@ with tab5:
             st.markdown(f"`{python_expr}`")
         st.write("")
 
-# Supongamos que estas son tus variables y derivadas simbólicas
-variables = ['x', 'y', 'z']  # ejemplo
-derivatives = {var: sp.symbols(f'df_d{var}') for var in variables}
+    # Fórmulas en LaTeX
+    formulas = r"""
+    \begin{align}
+    \Delta x \\
+    \varepsilon_x = \frac{\Delta x}{x} \\
+    \Delta R = \sqrt{(\Delta A)^2 + (\Delta B)^2} \\
+    \frac{\Delta R}{R} = \sqrt{\left(\frac{\Delta A}{A}\right)^2 + \left(\frac{\Delta B}{B}\right)^2} \\
+    \frac{\Delta R}{R} = |n| \frac{\Delta A}{A} \\
+    \bar{x} = \frac{1}{N}\sum_{i=1}^{N} x_i \\
+    s = \sqrt{\frac{1}{N-1} \sum_{i=1}^{N} (x_i - \bar{x})^2} \\
+    \Delta \bar{x} = \frac{s}{\sqrt{N}} \\
+    \Delta f = \sqrt{\left(\frac{\partial f}{\partial x_1} \Delta x_1\right)^2 + \dots + \left(\frac{\partial f}{\partial x_n} \Delta x_n\right)^2} \\
+    \sigma^2 = \frac{1}{N} \sum_{i=1}^{N} (x_i - \mu)^2 \\
+    \sigma = \sqrt{\sigma^2} \\
+    \sigma_{\bar{x}} = \frac{\sigma}{\sqrt{N}}
+    \end{align}
+        """
 
-# Construir las líneas de derivadas parciales en LaTeX
-partials = " \\\\ ".join([r"\frac{\partial f}{\partial %s} = %s" % (var, sp.latex(derivatives[var])) 
-                          for var in variables])
-
-# Fórmula de incertidumbre combinada
-terms = " + ".join([f"({sp.latex(derivatives[var])} \cdot u_{{{var}}})^2" for var in variables])
-combined_unc = r"u_c = \sqrt{" + terms + "}"
-
-# Incertidumbre relativa
-rel_unc = r"u_{rel} = \frac{u_c}{|f|}"
-
-# Estadísticas
-stats = r"\bar{x}, \quad \sigma"
-
-# Unir todo con separación clara
-all_formulas = partials + r" \\[5mm] " + combined_unc + r" \\[5mm] " + rel_unc + r" \\[5mm] " + stats
-
-# Mostrar en st.latex
-st.latex(all_formulas)
+    # Mostrar todas las fórmulas juntas
+    st.latex(formulas)
