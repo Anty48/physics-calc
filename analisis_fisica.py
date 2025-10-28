@@ -761,20 +761,20 @@ with tab5:
 
     # Fórmulas en LaTeX
     formulas = r"""
-    \begin{align}
-    \Delta x \\
-    \varepsilon_x = \frac{\Delta x}{x} \\
-    \Delta R = \sqrt{(\Delta A)^2 + (\Delta B)^2} \\
-    \frac{\Delta R}{R} = \sqrt{\left(\frac{\Delta A}{A}\right)^2 + \left(\frac{\Delta B}{B}\right)^2} \\
-    \frac{\Delta R}{R} = |n| \frac{\Delta A}{A} \\
-    \bar{x} = \frac{1}{N}\sum_{i=1}^{N} x_i \\
-    s = \sqrt{\frac{1}{N-1} \sum_{i=1}^{N} (x_i - \bar{x})^2} \\
-    \Delta \bar{x} = \frac{s}{\sqrt{N}} \\
-    \Delta f = \sqrt{\left(\frac{\partial f}{\partial x_1} \Delta x_1\right)^2 + \dots + \left(\frac{\partial f}{\partial x_n} \Delta x_n\right)^2} \\
-    \sigma^2 = \frac{1}{N} \sum_{i=1}^{N} (x_i - \mu)^2 \\
-    \sigma = \sqrt{\sigma^2} \\
-    \sigma_{\bar{x}} = \frac{\sigma}{\sqrt{N}}
-    \end{align}
+    \begin{align*}
+    u_x & = x \,? \\
+    \varepsilon_x & = \frac{u_x}{x} \\
+    u_R & = \sqrt{u_A^2 + u_B^2} \\
+    \frac{u_R}{R} & = \sqrt{\left(\frac{u_A}{A}\right)^2 + \left(\frac{u_B}{B}\right)^2} \\
+    \frac{u_R}{R} & = |n| \frac{u_A}{A} \\
+    \bar{x} & = \frac{1}{N}\sum_{i=1}^{N} x_i \\
+    s & = \sqrt{\frac{1}{N-1} \sum_{i=1}^{N} (x_i - \bar{x})^2} \\
+    u_{\bar{x}} & = \frac{s}{\sqrt{N}} \\
+    u_f & = \sqrt{\left(\frac{\partial f}{\partial x_1} u_{x_1}\right)^2 + \dots + \left(\frac{\partial f}{\partial x_n} u_{x_n}\right)^2} \\
+    \sigma^2 & = \frac{1}{N} \sum_{i=1}^{N} (x_i - \mu)^2 \\
+    \sigma & = \sqrt{\sigma^2} \\
+    \sigma_{\bar{x}} & = \frac{\sigma}{\sqrt{N}}
+    \end{align*}
         """
 
     # Mostrar todas las fórmulas juntas
