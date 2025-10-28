@@ -220,7 +220,6 @@ with tab1:
             ax.set_xlabel(var_name)
             ax.set_ylabel('Frecuencia')
             ax.set_title(f'Distribución de mediciones para {var_name}')
-            ax.grid(True, linestyle='--', alpha=0.7)
             ax.legend()
             
             st.pyplot(fig)
@@ -320,7 +319,6 @@ with tab1:
             ax.set_xlabel(x_var)
             ax.set_ylabel(y_var)
             ax.set_title(f'Regresión Lineal: {y_var} vs {x_var}')
-            ax.grid(True, linestyle='--', alpha=0.7)
             ax.legend()
             
             st.pyplot(fig)
@@ -551,9 +549,7 @@ with tab2:
                 
                 ax.set_xlabel('Variables')
                 ax.set_ylabel('Contribución a la incertidumbre total (%)')
-                ax.set_title('Contribución de cada variable a la incertidumbre combinada')
-                ax.grid(axis='y', linestyle='--', alpha=0.7)
-                
+                ax.set_title('Contribución de cada variable a la incertidumbre combinada')                
                 st.pyplot(fig)
             
         except Exception as e:
@@ -562,10 +558,6 @@ with tab2:
 with tab3:
     st.header("Gráficas automáticas con incertidumbres y funciones")
     st.write("Puedes introducir datos manualmente, subir un CSV o superponer funciones explícitas para comparar.")
-
-    import numpy as np
-    import matplotlib.pyplot as plt
-    import pandas as pd
 
     # Inicializar lista de gráficas y CSV persistente
     if "graficas" not in st.session_state:
@@ -683,7 +675,7 @@ with tab3:
                 for g in st.session_state.graficas:
                     ax.errorbar(
                         g["xs"], g["ys"], xerr=g["dxs"], yerr=g["dys"],
-                        fmt='o-' if np.any(g["dxs"] + g["dys"]) else '-',
+                        fmt='o' if np.any(g["dxs"] + g["dys"]) else '-',
                         capsize=4, ecolor='black', color=g["color"], label=g["label"]
                     )
                     titulos.append(g["label"])
@@ -691,7 +683,6 @@ with tab3:
                 ax.set_ylabel("Y")
                 ax.set_title(" + ".join(titulos))
                 ax.legend()
-                ax.grid(True)
                 st.pyplot(fig, use_container_width=True)
                 st.info("Cada color representa un conjunto de datos o función distinto con sus incertidumbres.")
 
