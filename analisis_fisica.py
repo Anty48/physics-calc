@@ -292,7 +292,7 @@ with tab1:
             fig, ax = plt.subplots(figsize=(10, 6))
             
             # Datos originales
-            ax.scatter(x, y, color='blue', alpha=0.7, label='Datos')
+            ax.scatter(x, y, color='blue', alpha=0.7, label='Dades')
             
             # Línea de regresión
             x_line = np.linspace(min(x), max(x), 100)
