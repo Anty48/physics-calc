@@ -286,7 +286,7 @@ with tab1:
             st.dataframe(reg_results)
             
             # Ecuación de la regresión con incertidumbres
-            st.write(f"Ecuación de la regresión: y = ({slope:.{st.session_state.precision}f} ± {sd_slope:.{st.session_state.precision}f})x + ({intercept:.{st.session_state.precision}f} ± {sd_intercept:.{st.session_state.precision}f})")
+            st.write(f"Ecuació de la regresió: y = ({slope:.{st.session_state.precision}f} ± {sd_slope:.{st.session_state.precision}f})x + ({intercept:.{st.session_state.precision}f} ± {sd_intercept:.{st.session_state.precision}f})")
             
             # Gráfico de regresión
             fig, ax = plt.subplots(figsize=(10, 6))
@@ -298,7 +298,7 @@ with tab1:
             x_line = np.linspace(min(x), max(x), 100)
             y_line = slope * x_line + intercept
             ax.plot(x_line, y_line, color='red', 
-                    label=f'Regresión: y = {slope:.{st.session_state.precision}f}x + {intercept:.{st.session_state.precision}f}')
+                    label=f'Regresió: y = {slope:.{st.session_state.precision}f}x + {intercept:.{st.session_state.precision}f}')
             
             # Bandas de confianza (simplificadas)
             # Calculamos los intervalos de confianza del 95% para la línea de regresión
@@ -312,12 +312,12 @@ with tab1:
             y_lower = y_line - t_critical * se_line
             
             # Añadir bandas de confianza al gráfico
-            ax.fill_between(x_line, y_lower, y_upper, color='grey', alpha=0.2, label='Intervalo de confianza 95%')
+            ax.fill_between(x_line, y_lower, y_upper, color='grey', alpha=0.2, label='Interval de confiança 95%')
             
             # Personalización
             ax.set_xlabel(x_var)
             ax.set_ylabel(y_var)
-            ax.set_title(f'Regresión Lineal: {y_var} vs {x_var}')
+            ax.set_title(f'Regresió Lineal: {y_var} vs {x_var}')
             ax.legend()
             
             st.pyplot(fig)
